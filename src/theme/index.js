@@ -55,10 +55,10 @@ const themesOptions = [
         paper: colors.common.white
       },
       primary: {
-        main: colors.indigo[600]
+        main: colors.orange[800]
       },
       secondary: {
-        main: '#5850EC'
+        main: colors.orange[400]
       },
       text: {
         primary: colors.blueGrey[900],

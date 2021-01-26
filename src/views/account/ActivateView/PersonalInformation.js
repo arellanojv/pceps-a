@@ -11,6 +11,7 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { AddressStateSelect } from 'src/components/AddressStateSelect';
+import FilesDropzone from 'src/components/FilesDropzone';
 
 const PersonalInformation = ({
   onBack,
@@ -111,6 +112,17 @@ const PersonalInformation = ({
             <Grid item xs={12} >
               <TextField fullWidth name="contactnumber" label="Contact Number" variant="outlined" size="small"/>
             </Grid>
+            <Grid item xs={12} mt="6">
+              <Typography variant="h6" color="textPrimary">Valid identification documents</Typography>
+              <Typography variant="caption" display="block" gutterBottom>
+                Please upload one (1) Primary ID or two (2) Secondary IDs (only if you cannot provide a primary ID), and make sure they are legible.
+
+                Accepted files are .jpg, .png or .pdf with a file size lower than 25 MB.
+              </Typography>
+            </Grid>
+            <Grid item xs={12} >
+              <FilesDropzone />
+            </Grid>            
         </Grid>
       </Box>
       <Box 

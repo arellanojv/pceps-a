@@ -114,7 +114,7 @@ const FilesDropzone = ({ className, ...rest }) => {
               {' '}
               <Link underline="always">browse</Link>
               {' '}
-              thorough your machine
+              through your machine
             </Typography>
           </Box>
         </div>

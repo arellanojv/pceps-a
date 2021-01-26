@@ -30,39 +30,22 @@ import {
   File as FileIcon
 } from 'react-feather';
 import Page from 'src/components/Page';
-import UserDetails from './UserDetails';
-import ProjectDetails from './ProjectDetails';
-import ProjectDescription from './ProjectDescription';
 import PersonalInformation from './PersonalInformation';
+import BusinessInformation from './BusinessInformation';
+import StatementOfAcceptance from './StatementOfAcceptance';
 
 const steps = [
   {
     label: 'Personal information',
+    icon: UserIcon
+  },
+  {
+    label: 'Business information',
     icon: BriefcaseIcon
   },
   {
-    label: 'Company Information',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'Company Profile',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'General Information',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'General Information',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'Purchase Request Details',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'Payment',
-    icon: BriefcaseIcon
+    label: 'Statement of Acceptance',
+    icon: FileIcon
   }
 ];
 
@@ -147,7 +130,7 @@ const ActivateView  = () => {
   return (
     <Page
       className={classes.root}
-      title="Project Create"
+      title="PCEPS | Account Activation"
     >
       <Container maxWidth="lg">
         <Box mb={3}>
@@ -167,7 +150,7 @@ const ActivateView  = () => {
               variant="body1"
               color="textPrimary"
             >
-              Purchase Request
+              Activate
             </Typography>
           </Breadcrumbs>
           <Typography
@@ -213,17 +196,13 @@ const ActivateView  = () => {
                     <PersonalInformation onNext={handleNext} />
                   )}
                   {activeStep === 1 && (
-                    <UserDetails
+                    <BusinessInformation
                       onBack={handleBack}
                       onNext={handleNext}
                     />
-                    // <ProjectDetails
-                    //   onBack={handleBack}
-                    //   onNext={handleNext}
-                    // />
                   )}
                   {activeStep === 2 && (
-                    <ProjectDescription
+                    <StatementOfAcceptance
                       onBack={handleBack}
                       onComplete={handleComplete}
                     />
