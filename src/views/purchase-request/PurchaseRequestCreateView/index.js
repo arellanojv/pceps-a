@@ -31,13 +31,12 @@ import {
 } from 'react-feather';
 import Page from 'src/components/Page';
 import UserDetails from './UserDetails';
-import ProjectDetails from './ProjectDetails';
 import ProjectDescription from './ProjectDescription';
-import PostingGuidlines from './PostingGuidlines';
+import PurchaseRequestInformation from './PurchaseRequestInformation';
 
 const steps = [
   {
-    label: 'Posting Guidelines',
+    label: 'Purchase Request Infomation',
     icon: BriefcaseIcon
   },
   {
@@ -210,8 +209,7 @@ const PurchaseRequestCreateView  = () => {
               >
                 <Box p={3}>
                   {activeStep === 0 && (
-                    <PostingGuidlines onNext={handleNext} />
-                    // <UserDetails onNext={handleNext} />
+                    <PurchaseRequestInformation onNext={handleNext} />
                   )}
                   {activeStep === 1 && (
                     <UserDetails
