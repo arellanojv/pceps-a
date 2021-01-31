@@ -7,9 +7,11 @@ import {
   FormHelperText,
   Paper,
   Typography,
+  Grid,
   makeStyles,
 } from "@material-ui/core";
 import QuillEditor from "src/components/QuillEditor";
+import FilesDropzone from "src/components/FilesDropzone";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -23,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProjectDescription = ({ className, onBack, onComplete, ...rest }) => {
+const ScopeOfWork = ({ className, onBack, onNext, ...rest }) => {
   const classes = useStyles();
   const [content, setContent] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
@@ -41,8 +43,8 @@ const ProjectDescription = ({ className, onBack, onComplete, ...rest }) => {
 
       // NOTE: Make API request
 
-      if (onComplete) {
-        onComplete();
+      if (onNext) {
+        onNext();
       }
     } catch (err) {
       console.error(err);
@@ -58,15 +60,10 @@ const ProjectDescription = ({ className, onBack, onComplete, ...rest }) => {
       className={clsx(classes.root, className)}
       {...rest}
     >
-      <Typography variant="h3" color="textPrimary">
-        Please select one option
+      <Typography variant="h5" color="textPrimary">
+        Describe your purchase request
       </Typography>
-      <Box mt={2}>
-        <Typography variant="subtitle1" color="textSecondary">
-          Proin tincidunt lacus sed ante efficitur efficitur. Quisque aliquam
-          fringilla velit sit amet euismod.
-        </Typography>
-      </Box>
+
       <Paper className={classes.editorContainer} variant="outlined">
         <QuillEditor
           handleChange={handleChange}
@@ -74,6 +71,16 @@ const ProjectDescription = ({ className, onBack, onComplete, ...rest }) => {
           className={classes.editor}
         />
       </Paper>
+
+      <Box mt={2}>
+        <Typography variant="h5" color="textPrimary">
+          Project images or documents
+        </Typography>
+        <Grid item xs={12}>
+          <FilesDropzone />
+        </Grid>
+      </Box>
+
       {error && (
         <Box mt={2}>
           <FormHelperText error>{FormHelperText}</FormHelperText>
@@ -100,15 +107,15 @@ const ProjectDescription = ({ className, onBack, onComplete, ...rest }) => {
   );
 };
 
-ProjectDescription.propTypes = {
+ScopeOfWork.propTypes = {
   className: PropTypes.string,
-  onComplete: PropTypes.func,
+  onNext: PropTypes.func,
   onBack: PropTypes.func,
 };
 
-ProjectDescription.defaultProps = {
-  onComplete: () => {},
+ScopeOfWork.defaultProps = {
+  onNext: () => {},
   onBack: () => {},
 };
 
-export default ProjectDescription;
+export default ScopeOfWork;

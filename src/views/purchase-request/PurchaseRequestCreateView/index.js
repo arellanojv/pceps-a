@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useState } from "react";
+import clsx from "clsx";
+import PropTypes from "prop-types";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Avatar,
   Box,
@@ -20,50 +20,34 @@ import {
   Typography,
   colors,
   makeStyles,
-  withStyles
-} from '@material-ui/core';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+  withStyles,
+} from "@material-ui/core";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import {
   User as UserIcon,
   Star as StarIcon,
   Briefcase as BriefcaseIcon,
-  File as FileIcon
-} from 'react-feather';
-import Page from 'src/components/Page';
-import UserDetails from './UserDetails';
-import ProjectDetails from './ProjectDetails';
-import ProjectDescription from './ProjectDescription';
-import PostingGuidlines from './PostingGuidlines';
+  File as FileIcon,
+} from "react-feather";
+import Page from "src/components/Page";
+import UserDetails from "./UserDetails";
+import ProjectDescription from "./ProjectDescription";
+import PurchaseRequestForm from "./PurchaseRequestForm";
+import ScopeOfWork from "./ScopeOfWork";
 
 const steps = [
   {
-    label: 'Posting Guidelines',
-    icon: BriefcaseIcon
+    label: "Purchase Request Details",
+    icon: BriefcaseIcon,
   },
   {
-    label: 'Company Information',
-    icon: BriefcaseIcon
+    label: "Scope of Work",
+    icon: BriefcaseIcon,
   },
   {
-    label: 'Company Profile',
-    icon: BriefcaseIcon
+    label: "Confirmation",
+    icon: BriefcaseIcon,
   },
-  {
-    label: 'General Information',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'General Information',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'Purchase Request Details',
-    icon: BriefcaseIcon
-  },
-  {
-    label: 'Payment',
-    icon: BriefcaseIcon
-  }
 ];
 
 const CustomStepConnector = withStyles((theme) => ({
@@ -72,8 +56,8 @@ const CustomStepConnector = withStyles((theme) => ({
     padding: 0,
   },
   line: {
-    borderColor: theme.palette.divider
-  }
+    borderColor: theme.palette.divider,
+  },
 }))(StepConnector);
 
 const useCustomStepIconStyles = makeStyles((theme) => ({
@@ -81,12 +65,12 @@ const useCustomStepIconStyles = makeStyles((theme) => ({
   active: {
     backgroundColor: theme.palette.secondary.main,
     boxShadow: theme.shadows[10],
-    color: theme.palette.secondary.contrastText
+    color: theme.palette.secondary.contrastText,
   },
   completed: {
     backgroundColor: theme.palette.secondary.main,
-    color: theme.palette.secondary.contrastText
-  }
+    color: theme.palette.secondary.contrastText,
+  },
 }));
 
 const CustomStepIcon = ({ active, completed, icon }) => {
@@ -98,7 +82,7 @@ const CustomStepIcon = ({ active, completed, icon }) => {
     <Avatar
       className={clsx(classes.root, {
         [classes.active]: active,
-        [classes.completed]: completed
+        [classes.completed]: completed,
       })}
     >
       <Icon size="20" />
@@ -109,25 +93,25 @@ const CustomStepIcon = ({ active, completed, icon }) => {
 CustomStepIcon.propTypes = {
   active: PropTypes.bool,
   completed: PropTypes.bool,
-  icon: PropTypes.number.isRequired
+  icon: PropTypes.number.isRequired,
 };
 
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.background.dark,
-    minHeight: '100%',
+    minHeight: "100%",
     paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3)
+    paddingBottom: theme.spacing(3),
   },
   avatar: {
-    backgroundColor: colors.red[600]
+    backgroundColor: colors.red[600],
   },
   stepper: {
-    backgroundColor: 'transparent'
-  }
+    backgroundColor: "transparent",
+  },
 }));
 
-const PurchaseRequestCreateView  = () => {
+const PurchaseRequestCreateView = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState(false);
@@ -145,10 +129,7 @@ const PurchaseRequestCreateView  = () => {
   };
 
   return (
-    <Page
-      className={classes.root}
-      title="Project Create"
-    >
+    <Page className={classes.root} title="Project Create">
       <Container maxWidth="lg">
         <Box mb={3}>
           <Breadcrumbs
@@ -163,31 +144,15 @@ const PurchaseRequestCreateView  = () => {
             >
               Dashboard
             </Link>
-            <Typography
-              variant="body1"
-              color="textPrimary"
-            >
+            <Typography variant="body1" color="textPrimary">
               Purchase Request
             </Typography>
           </Breadcrumbs>
-          <Typography
-            variant="h3"
-            color="textPrimary"
-          >
-            Activate your PCEPS account
-          </Typography>
-          <Typography variant="body2">
-            Before you can create purchase requests on PCEPS, we need to learn more information about you and your business.
-          </Typography>
         </Box>
         {!completed ? (
           <Paper>
             <Grid container>
-              <Grid
-                item
-                xs={12}
-                md={3}
-              >
+              <Grid item xs={12} md={3}>
                 <Stepper
                   activeStep={activeStep}
                   className={classes.stepper}
@@ -203,25 +168,13 @@ const PurchaseRequestCreateView  = () => {
                   ))}
                 </Stepper>
               </Grid>
-              <Grid
-                item
-                xs={12}
-                md={9}
-              >
+              <Grid item xs={12} md={9}>
                 <Box p={3}>
                   {activeStep === 0 && (
-                    <PostingGuidlines onNext={handleNext} />
-                    // <UserDetails onNext={handleNext} />
+                    <PurchaseRequestForm onNext={handleNext} />
                   )}
                   {activeStep === 1 && (
-                    <UserDetails
-                      onBack={handleBack}
-                      onNext={handleNext}
-                    />
-                    // <ProjectDetails
-                    //   onBack={handleBack}
-                    //   onNext={handleNext}
-                    // />
+                    <ScopeOfWork onBack={handleBack} onNext={handleNext} />
                   )}
                   {activeStep === 2 && (
                     <ProjectDescription
@@ -236,24 +189,14 @@ const PurchaseRequestCreateView  = () => {
         ) : (
           <Card>
             <CardContent>
-              <Box
-                maxWidth={450}
-                mx="auto"
-              >
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                >
+              <Box maxWidth={450} mx="auto">
+                <Box display="flex" justifyContent="center">
                   <Avatar className={classes.avatar}>
                     <StarIcon />
                   </Avatar>
                 </Box>
                 <Box mt={2}>
-                  <Typography
-                    variant="h3"
-                    color="textPrimary"
-                    align="center"
-                  >
+                  <Typography variant="h3" color="textPrimary" align="center">
                     You are all done!
                   </Typography>
                 </Box>
@@ -263,15 +206,11 @@ const PurchaseRequestCreateView  = () => {
                     color="textSecondary"
                     align="center"
                   >
-                    Donec ut augue sed nisi ullamcorper posuere sit amet eu mauris.
-                    Ut eget mauris scelerisque.
+                    Donec ut augue sed nisi ullamcorper posuere sit amet eu
+                    mauris. Ut eget mauris scelerisque.
                   </Typography>
                 </Box>
-                <Box
-                  mt={2}
-                  display="flex"
-                  justifyContent="center"
-                >
+                <Box mt={2} display="flex" justifyContent="center">
                   <Button
                     variant="contained"
                     color="secondary"
