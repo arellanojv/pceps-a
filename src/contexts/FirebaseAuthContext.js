@@ -1,27 +1,23 @@
-import React, {
-  createContext,
-  useEffect,
-  useReducer
-} from 'react';
-import SplashScreen from 'src/components/SplashScreen';
-import firebase from 'src/lib/firebase';
+import React, { createContext, useEffect, useReducer } from "react";
+import SplashScreen from "src/components/SplashScreen";
+import firebase from "src/lib/firebase";
 
 const initialAuthState = {
   isAuthenticated: false,
   isInitialised: false,
-  user: null
+  user: null,
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'AUTH_STATE_CHANGED': {
+    case "AUTH_STATE_CHANGED": {
       const { isAuthenticated, user } = action.payload;
 
       return {
         ...state,
         isAuthenticated,
         isInitialised: true,
-        user
+        user,
       };
     }
     default: {
@@ -32,11 +28,11 @@ const reducer = (state, action) => {
 
 const AuthContext = createContext({
   ...initialAuthState,
-  method: 'FirebaseAuth',
+  method: "FirebaseAuth",
   createUserWithEmailAndPassword: () => Promise.resolve(),
   signInWithEmailAndPassword: () => Promise.resolve(),
   signInWithGoogle: () => Promise.resolve(),
-  logout: () => Promise.resolve()
+  logout: () => Promise.resolve(),
 });
 
 export const AuthProvider = ({ children }) => {
@@ -53,7 +49,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const createUserWithEmailAndPassword = async (email, password) => {
-    return firebase.auth().createUserWithEmailAndPassword(email, password);
+    try {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then((cred) => {
+          console.log("CRED", cred);
+          firebase.firestore().collection("users").doc(cred.user.uid).set({
+            type: "contractor",
+          });
+        });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const logout = () => {
@@ -67,7 +75,7 @@ export const AuthProvider = ({ children }) => {
         // The auth state only provides basic information.
 
         dispatch({
-          type: 'AUTH_STATE_CHANGED',
+          type: "AUTH_STATE_CHANGED",
           payload: {
             isAuthenticated: true,
             user: {
@@ -75,17 +83,17 @@ export const AuthProvider = ({ children }) => {
               avatar: user.photoURL,
               email: user.email,
               name: user.displayName || user.email,
-              tier: 'Premium'
-            }
-          }
+              tier: "Premium",
+            },
+          },
         });
       } else {
         dispatch({
-          type: 'AUTH_STATE_CHANGED',
+          type: "AUTH_STATE_CHANGED",
           payload: {
             isAuthenticated: false,
-            user: null
-          }
+            user: null,
+          },
         });
       }
     });
@@ -101,11 +109,11 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         ...state,
-        method: 'FirebaseAuth',
+        method: "FirebaseAuth",
         createUserWithEmailAndPassword,
         signInWithEmailAndPassword,
         signInWithGoogle,
-        logout
+        logout,
       }}
     >
       {children}

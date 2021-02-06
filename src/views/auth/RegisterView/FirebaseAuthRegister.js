@@ -1,8 +1,8 @@
-import React from 'react';
-import clsx from 'clsx';
-import * as Yup from 'yup';
-import PropTypes from 'prop-types';
-import { Formik } from 'formik';
+import React from "react";
+import clsx from "clsx";
+import * as Yup from "yup";
+import PropTypes from "prop-types";
+import { Formik } from "formik";
 import {
   Box,
   Button,
@@ -12,25 +12,25 @@ import {
   Link,
   TextField,
   Typography,
-  makeStyles
-} from '@material-ui/core';
-import useAuth from 'src/hooks/useAuth';
-import useIsMountedRef from 'src/hooks/useIsMountedRef';
+  makeStyles,
+} from "@material-ui/core";
+import useAuth from "src/hooks/useAuth";
+import useIsMountedRef from "src/hooks/useIsMountedRef";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
   googleButton: {
-    backgroundColor: theme.palette.common.white
+    backgroundColor: theme.palette.common.white,
   },
   providerIcon: {
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(2),
   },
   divider: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   dividerText: {
-    margin: theme.spacing(2)
-  }
+    margin: theme.spacing(2),
+  },
 }));
 
 const FirebaseAuthRegister = ({ className, ...rest }) => {
@@ -41,7 +41,7 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
   const handleGoogleClick = async () => {
     try {
       await signInWithGoogle();
-    } catch(err) {
+    } catch (err) {
       console.error(err);
     }
   };
@@ -62,47 +62,38 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
         />
         Register with Google
       </Button>
-      <Box
-        alignItems="center"
-        display="flex"
-        mt={2}
-      >
-        <Divider
-          className={classes.divider}
-          orientation="horizontal"
-        />
-        <Typography 
+      <Box alignItems="center" display="flex" mt={2}>
+        <Divider className={classes.divider} orientation="horizontal" />
+        <Typography
           color="textSecondary"
           variant="body1"
           className={classes.dividerText}
         >
           OR
         </Typography>
-        <Divider
-          className={classes.divider}
-          orientation="horizontal"
-        />
+        <Divider className={classes.divider} orientation="horizontal" />
       </Box>
       <Formik
         initialValues={{
-          email: '',
-          password: '',
+          email: "",
+          password: "",
           policy: true,
-          submit: null
+          submit: null,
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          password: Yup.string().min(7).max(255).required('Password is required'),
-          policy: Yup.boolean().oneOf([true], 'This field must be checked')
+          email: Yup.string()
+            .email("Must be a valid email")
+            .max(255)
+            .required("Email is required"),
+          password: Yup.string()
+            .min(7)
+            .max(255)
+            .required("Password is required"),
+          policy: Yup.boolean().oneOf([true], "This field must be checked"),
         })}
-        onSubmit={async (values, {
-          setErrors,
-          setStatus,
-          setSubmitting
-        }) => {
+        onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
             await createUserWithEmailAndPassword(values.email, values.password);
-
             if (isMountedRef.current) {
               setStatus({ success: true });
               setSubmitting(false);
@@ -124,7 +115,7 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
           handleSubmit,
           isSubmitting,
           touched,
-          values
+          values,
         }) => (
           <form
             noValidate
@@ -158,42 +149,25 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
               value={values.password}
               variant="outlined"
             />
-            <Box
-              alignItems="center"
-              display="flex"
-              mt={2}
-              ml={-1}
-            >
+            <Box alignItems="center" display="flex" mt={2} ml={-1}>
               <Checkbox
                 checked={values.policy}
                 name="policy"
                 onChange={handleChange}
               />
-              <Typography
-                variant="body2"
-                color="textSecondary"
-              >
-                I have read the
-                {' '}
-                <Link
-                  component="a"
-                  href="#"
-                  color="secondary"
-                >
+              <Typography variant="body2" color="textSecondary">
+                I have read the{" "}
+                <Link component="a" href="#" color="secondary">
                   Terms and Conditions
                 </Link>
               </Typography>
             </Box>
             {Boolean(touched.policy && errors.policy) && (
-              <FormHelperText error>
-                {errors.policy}
-              </FormHelperText>
+              <FormHelperText error>{errors.policy}</FormHelperText>
             )}
             {errors.submit && (
               <Box mt={3}>
-                <FormHelperText error>
-                  {errors.submit}
-                </FormHelperText>
+                <FormHelperText error>{errors.submit}</FormHelperText>
               </Box>
             )}
             <Box mt={2}>
@@ -216,7 +190,7 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
 };
 
 FirebaseAuthRegister.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 
 export default FirebaseAuthRegister;
