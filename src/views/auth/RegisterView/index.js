@@ -69,22 +69,24 @@ const RegisterView = () => {
               alignItems="center"
               display="flex"
               justifyContent="space-between"
-              mb={3}
+              mb={1}
             >
               <div>
                 <Typography color="textPrimary" gutterBottom variant="h2">
                   Register
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Register on the internal platform
+                  Select a user type first
                 </Typography>
               </div>
             </Box>
-            <Box flexGrow={1} mt={3}>
+
+            <Box flexGrow={1} mt={0}>
               {method === "Auth0" && <Auth0Register />}
               {method === "FirebaseAuth" && <FirebaseAuthRegister />}
               {method === "JWT" && <JWTRegister />}
             </Box>
+
             <Box my={3}>
               <Divider />
             </Box>

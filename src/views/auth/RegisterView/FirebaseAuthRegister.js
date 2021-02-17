@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import * as Yup from "yup";
 import PropTypes from "prop-types";
 import { Formik } from "formik";
 import {
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
   Box,
   Button,
   Checkbox,
-  Divider,
   FormHelperText,
   Link,
   TextField,
@@ -35,52 +38,59 @@ const useStyles = makeStyles((theme) => ({
 
 const FirebaseAuthRegister = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { createUserWithEmailAndPassword, signInWithGoogle } = useAuth();
+  const { createUserWithEmailAndPassword } = useAuth();
   const isMountedRef = useIsMountedRef();
+  const [radioStatus, setRadioStatus] = useState(true);
+  const [type, setType] = useState("");
+  const phoneRegExp = /((^(\+)(\d){12}$)|(^\d{11}$))/;
 
-  const handleGoogleClick = async () => {
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      console.error(err);
-    }
+  const handleRadioChange = (event) => {
+    setType(event.target.value);
+    setRadioStatus(false);
   };
 
   return (
     <>
-      <Button
-        className={classes.googleButton}
-        fullWidth
-        onClick={handleGoogleClick}
-        size="large"
-        variant="contained"
-      >
-        <img
-          alt="Google"
-          className={classes.providerIcon}
-          src="/static/images/google.svg"
-        />
-        Register with Google
-      </Button>
-      <Box alignItems="center" display="flex" mt={2}>
-        <Divider className={classes.divider} orientation="horizontal" />
-        <Typography
-          color="textSecondary"
-          variant="body1"
-          className={classes.dividerText}
-        >
-          OR
-        </Typography>
-        <Divider className={classes.divider} orientation="horizontal" />
+      <Box mb={2}>
+        <FormControl component="fieldset">
+          <Typography variant="body2" color="textSecondary">
+            {" "}
+            I am a
+          </Typography>
+          <RadioGroup
+            aria-label="quiz"
+            name="quiz"
+            value={type}
+            onChange={handleRadioChange}
+          >
+            <FormControlLabel
+              value="customer"
+              control={<Radio />}
+              label="Customer"
+              size="small"
+            />
+            <FormControlLabel
+              value="contractor"
+              control={<Radio />}
+              label="Supplier / Contractor"
+              size="small"
+            />
+          </RadioGroup>
+        </FormControl>
       </Box>
+
       <Formik
         initialValues={{
+          phone: "",
           email: "",
           password: "",
           policy: true,
           submit: null,
         }}
         validationSchema={Yup.object().shape({
+          phone: Yup.string()
+            .matches(phoneRegExp, "Phone number is not valid")
+            .required("Phone number is required"),
           email: Yup.string()
             .email("Must be a valid email")
             .max(255)
@@ -93,7 +103,12 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
-            await createUserWithEmailAndPassword(values.email, values.password);
+            await createUserWithEmailAndPassword(
+              values.email,
+              values.password,
+              type,
+              values.phone
+            );
             if (isMountedRef.current) {
               setStatus({ success: true });
               setSubmitting(false);
@@ -124,6 +139,21 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
             {...rest}
           >
             <TextField
+              error={Boolean(touched.phone && errors.phone)}
+              fullWidth
+              helperText={touched.phone && errors.phone}
+              variant="outlined"
+              name="phone"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              type="phone"
+              value={values.phone}
+              label="Phone Number"
+              placeholder="+631234567890"
+              margin="normal"
+              disabled={radioStatus}
+            />
+            <TextField
               error={Boolean(touched.email && errors.email)}
               fullWidth
               helperText={touched.email && errors.email}
@@ -135,6 +165,7 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
               type="email"
               value={values.email}
               variant="outlined"
+              disabled={radioStatus}
             />
             <TextField
               error={Boolean(touched.password && errors.password)}
@@ -148,12 +179,14 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
               type="password"
               value={values.password}
               variant="outlined"
+              disabled={radioStatus}
             />
             <Box alignItems="center" display="flex" mt={2} ml={-1}>
               <Checkbox
                 checked={values.policy}
                 name="policy"
                 onChange={handleChange}
+                disabled={radioStatus}
               />
               <Typography variant="body2" color="textSecondary">
                 I have read the{" "}
@@ -178,6 +211,7 @@ const FirebaseAuthRegister = ({ className, ...rest }) => {
                 size="large"
                 type="submit"
                 variant="contained"
+                disabled={radioStatus}
               >
                 Register
               </Button>

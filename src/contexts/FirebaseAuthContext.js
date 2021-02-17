@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useReducer } from "react";
+import { useHistory } from "react-router-dom";
 import SplashScreen from "src/components/SplashScreen";
 import firebase from "src/lib/firebase";
 
@@ -36,6 +37,7 @@ const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
+  const history = useHistory();
   const [state, dispatch] = useReducer(reducer, initialAuthState);
 
   const signInWithEmailAndPassword = (email, password) => {
@@ -48,16 +50,33 @@ export const AuthProvider = ({ children }) => {
     return firebase.auth().signInWithPopup(provider);
   };
 
-  const createUserWithEmailAndPassword = async (email, password) => {
+  const createUserWithEmailAndPassword = async (
+    email,
+    password,
+    type,
+    phone
+  ) => {
     try {
       firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
         .then((cred) => {
-          console.log("CRED", cred);
           firebase.firestore().collection("users").doc(cred.user.uid).set({
-            type: "contractor",
+            type: type,
+            phone: phone,
           });
+          //send email verification
+          const currentUser = firebase.auth().currentUser;
+          if (!currentUser.emailVerified) {
+            currentUser
+              .sendEmailVerification()
+              .then(function () {
+                console.log("Email Verification Sent");
+              })
+              .catch(function (error) {
+                // An error happened.
+              });
+          }
         });
     } catch (err) {
       console.log(err);
@@ -70,23 +89,33 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      // history.push("/app/activate");
       if (user) {
         // Here you should extract the complete user profile to make it available in your entire app.
         // The auth state only provides basic information.
-
-        dispatch({
-          type: "AUTH_STATE_CHANGED",
-          payload: {
-            isAuthenticated: true,
-            user: {
-              id: user.uid,
-              avatar: user.photoURL,
-              email: user.email,
-              name: user.displayName || user.email,
-              tier: "Premium",
-            },
-          },
-        });
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(user.uid)
+          .get()
+          .then((userDoc) => {
+            console.log("User Collection Data:", userDoc.data().type);
+            console.log("Is Verified:", user.emailVerified);
+            dispatch({
+              type: "AUTH_STATE_CHANGED",
+              payload: {
+                isAuthenticated: true,
+                user: {
+                  id: user.uid,
+                  avatar: user.photoURL,
+                  email: user.email,
+                  name: user.displayName || user.email,
+                  tier: "Premium",
+                  blocking: user.emailVerified,
+                },
+              },
+            });
+          });
       } else {
         dispatch({
           type: "AUTH_STATE_CHANGED",
