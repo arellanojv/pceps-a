@@ -1,32 +1,32 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core';
-import TopBar from './TopBar';
+import React from "react";
+import PropTypes from "prop-types";
+import { makeStyles } from "@material-ui/core";
+import TopBar from "./TopBar";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.background.default,
-    display: 'flex',
-    height: '100%',
-    overflow: 'hidden',
-    width: '100%'
+    display: "flex",
+    height: "100%",
+    overflow: "hidden",
+    width: "100%",
   },
   wrapper: {
-    display: 'flex',
-    flex: '1 1 auto',
-    overflow: 'hidden',
-    paddingTop: 64
+    display: "flex",
+    flex: "1 1 auto",
+    overflow: "hidden",
+    paddingTop: 64,
   },
   contentContainer: {
-    display: 'flex',
-    flex: '1 1 auto',
-    overflow: 'hidden'
+    display: "flex",
+    flex: "1 1 auto",
+    overflow: "hidden",
   },
   content: {
-    flex: '1 1 auto',
-    height: '100%',
-    overflow: 'auto'
-  }
+    flex: "1 1 auto",
+    height: "100%",
+    overflow: "auto",
+  },
 }));
 
 const MainLayout = ({ children }) => {
@@ -37,9 +37,7 @@ const MainLayout = ({ children }) => {
       <TopBar />
       <div className={classes.wrapper}>
         <div className={classes.contentContainer}>
-          <div className={classes.content}>
-            {children}
-          </div>
+          <div className={classes.content}>{children}</div>
         </div>
       </div>
     </div>
@@ -47,7 +45,7 @@ const MainLayout = ({ children }) => {
 };
 
 MainLayout.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };
 
 export default MainLayout;

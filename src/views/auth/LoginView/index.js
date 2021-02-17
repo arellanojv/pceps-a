@@ -32,20 +32,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     minHeight: '100vh'
   },
-  banner: {
-    backgroundColor: theme.palette.background.paper,
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  bannerChip: {
-    marginRight: theme.spacing(2)
-  },
-  methodIcon: {
-    height: 30,
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2)
-  },
   cardContainer: {
     paddingBottom: 80,
     paddingTop: 80,
@@ -74,63 +60,6 @@ const LoginView = () => {
       className={classes.root}
       title="Login"
     >
-      <div className={classes.banner}>
-        <Container maxWidth="md">
-          <Box
-            alignItems="center"
-            display="flex"
-            justifyContent="center"
-          >
-            <Chip
-              color="secondary"
-              label="NEW"
-              size="small"
-              className={classes.bannerChip}
-            />
-            <Box
-              alignItems="center"
-              display="flex"
-            >
-              <Typography
-                color="textPrimary"
-                variant="h6"
-              >
-                Visit our
-                {' '}
-                <Link
-                  component={RouterLink}
-                  to="/docs"
-                >
-                  docs
-                </Link>
-                {' '}
-                and find out how to switch between
-              </Typography>
-              <Tooltip title="Auth0">
-                <img
-                  alt="Auth0"
-                  className={classes.methodIcon}
-                  src={methodIcons['Auth0']}
-                />
-              </Tooltip>
-              <Tooltip title="Firebase">
-                <img
-                  alt="Firebase"
-                  className={classes.methodIcon}
-                  src={methodIcons['FirebaseAuth']}
-                />
-              </Tooltip>
-              <Tooltip title="JSON Web Token">
-                <img
-                  alt="JWT"
-                  className={classes.methodIcon}
-                  src={methodIcons['JWT']}
-                />
-              </Tooltip>
-            </Box>
-          </Box>
-        </Container>
-      </div>
       <Container
         className={classes.cardContainer}
         maxWidth="sm"
@@ -167,12 +96,7 @@ const LoginView = () => {
                   Sign in on the internal platform
                 </Typography>
               </div>
-              <div className={classes.currentMethodIcon}>
-                <img
-                  alt="Auth method"
-                  src={methodIcons[method]}
-                />
-              </div>
+              
             </Box>
             <Box
               flexGrow={1}
