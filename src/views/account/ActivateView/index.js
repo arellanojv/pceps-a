@@ -34,7 +34,8 @@ import PersonalInformation from "./PersonalInformation";
 import BusinessInformation from "./BusinessInformation";
 import StatementOfAcceptance from "./StatementOfAcceptance";
 import BlockIt from "src/components/BlockIt";
-import useAuth from 'src/hooks/useAuth';
+import useAuth from "src/hooks/useAuth";
+import { DataProvider } from "src/contexts/UserActivationContext";
 
 const steps = [
   {
@@ -182,21 +183,24 @@ const ActivateView = () => {
                 </Grid>
                 <Grid item xs={12} md={9}>
                   <Box p={3}>
-                    {activeStep === 0 && (
-                      <PersonalInformation onNext={handleNext} />
-                    )}
-                    {activeStep === 1 && (
-                      <BusinessInformation
-                        onBack={handleBack}
-                        onNext={handleNext}
-                      />
-                    )}
-                    {activeStep === 2 && (
-                      <StatementOfAcceptance
-                        onBack={handleBack}
-                        onComplete={handleComplete}
-                      />
-                    )}
+                    <DataProvider>
+                      {activeStep === 0 && (
+                        // <PersonalInformation onNext={handleNext} />
+                        <StatementOfAcceptance onNext={handleNext} />
+                      )}
+                      {activeStep === 1 && (
+                        <BusinessInformation
+                          onBack={handleBack}
+                          onNext={handleNext}
+                        />
+                      )}
+                      {activeStep === 2 && (
+                        <StatementOfAcceptance
+                          onBack={handleBack}
+                          onComplete={handleComplete}
+                        />
+                      )}
+                    </DataProvider>
                   </Box>
                 </Grid>
               </Grid>
