@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from "react";
-import clsx from "clsx";
-import { useDropzone } from "react-dropzone";
-import PerfectScrollbar from "react-perfect-scrollbar";
-import PropTypes from "prop-types";
+import React, { useState, useCallback } from 'react';
+import clsx from 'clsx';
+import { useDropzone } from 'react-dropzone';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import PropTypes from 'prop-types';
 import {
   Box,
   Button,
@@ -12,28 +12,28 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Tooltip,
   Typography,
   makeStyles,
-  FormHelperText,
-} from "@material-ui/core";
-import FileCopyIcon from "@material-ui/icons/FileCopy";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
-import bytesToSize from "src/utils/bytesToSize";
+} from '@material-ui/core';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+import MoreIcon from '@material-ui/icons/MoreVert';
+import bytesToSize from 'src/utils/bytesToSize';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
   dropZone: {
     border: `1px dashed ${theme.palette.divider}`,
     padding: theme.spacing(6),
-    outline: "none",
-    display: "flex",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    alignItems: "center",
-    "&:hover": {
+    outline: 'none',
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    '&:hover': {
       backgroundColor: theme.palette.action.hover,
       opacity: 0.5,
-      cursor: "pointer",
+      cursor: 'pointer',
     },
   },
   dragActive: {
@@ -51,19 +51,15 @@ const useStyles = makeStyles((theme) => ({
   },
   actions: {
     marginTop: theme.spacing(2),
-    display: "flex",
-    justifyContent: "flex-end",
-    "& > * + *": {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    '& > * + *': {
       marginLeft: theme.spacing(2),
     },
   },
 }));
 
-// const maxSize = 1048576;
-const maxSize = 248576;
-
-const FilesDropzone = (props) => {
-  const { onChange } = props;
+const FilesDropzone = ({ className, onChange, ...rest }) => {
   const classes = useStyles();
   const [files, setFiles] = useState([]);
 
@@ -75,30 +71,14 @@ const FilesDropzone = (props) => {
     setFiles([]);
   };
 
-  const handleRemove = (file) => {
-    const newFiles = [...files]; // make a var for the new array
-    newFiles.splice(file, 1); // remove the file from the array
-    setFiles(newFiles);
-  };
-
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragReject,
-    rejectedFiles,
-  } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    noDrag: true,
+    maxFiles:2,
     onDrop: handleDrop,
-    accepts: "image/jpeg, image/png, application/pdf",
   });
 
-  // const isFileTooLarge =
-  //   rejectedFiles.length > 0 && rejectedFiles[0].size > maxSize;
-
-  console.log("FILE MESSAGE", isDragActive);
-
   return (
-    <div className={clsx(classes.root)}>
+    <div className={clsx(classes.root, className)} {...rest}>
       <div
         className={clsx({
           [classes.dropZone]: true,
@@ -120,8 +100,8 @@ const FilesDropzone = (props) => {
           </Typography>
           <Box mt={2}>
             <Typography color="textPrimary" variant="body1">
-              Drop files here or click <Link underline="always">browse</Link>{" "}
-              through your machine
+              Drop files here or click <Link underline="always">browse</Link>{' '}
+              thorough your machine
             </Typography>
           </Box>
         </div>
@@ -137,13 +117,14 @@ const FilesDropzone = (props) => {
                   </ListItemIcon>
                   <ListItemText
                     primary={file.name}
-                    primaryTypographyProps={{ variant: "h5" }}
+                    primaryTypographyProps={{ variant: 'h5' }}
                     secondary={bytesToSize(file.size)}
                   />
-
-                  <IconButton edge="end" onClick={() => handleRemove(i)}>
-                    <DeleteForeverIcon />
-                  </IconButton>
+                  <Tooltip title="More options">
+                    <IconButton edge="end">
+                      <MoreIcon />
+                    </IconButton>
+                  </Tooltip>
                 </ListItem>
               ))}
             </List>
@@ -152,18 +133,12 @@ const FilesDropzone = (props) => {
             <Button onClick={handleRemoveAll} size="small">
               Remove all
             </Button>
-            {/* <Button color="secondary" size="small" variant="contained">
+            <Button color="secondary" size="small" variant="contained">
               Upload files
-            </Button> */}
+            </Button>
           </div>
         </>
       )}
-
-      {/* {isFileTooLarge && (
-        <FormHelperText error hidden={isDragActive}>
-          File is too large
-        </FormHelperText>
-      )} */}
     </div>
   );
 };

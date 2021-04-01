@@ -185,8 +185,7 @@ const ActivateView = () => {
                   <Box p={3}>
                     <DataProvider>
                       {activeStep === 0 && (
-                        // <PersonalInformation onNext={handleNext} />
-                        <StatementOfAcceptance onNext={handleNext} />
+                        <PersonalInformation onNext={handleNext} />
                       )}
                       {activeStep === 1 && (
                         <BusinessInformation

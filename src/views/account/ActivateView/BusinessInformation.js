@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   Box,
   Button,
@@ -7,35 +7,39 @@ import {
   Grid,
   TextField,
   FormHelperText,
-} from "@material-ui/core";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import { AddressStateSelect } from "src/components/AddressStateSelect";
-import FilesDropzone from "src/components/FilesDropzone";
-import { useForm, Controller } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { Input } from "src/components/Input";
-import { useData } from "src/contexts/UserActivationContext";
+} from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { KeyboardDatePicker } from '@material-ui/pickers';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Input } from 'src/components/Input';
+import { useData } from 'src/contexts/UserActivationContext';
+import { STATEADDRESS } from 'src/constants/addressstate';
+import { format } from 'date-fns';
+import { DropzoneArea } from 'material-ui-dropzone';
 
 const schema = yup.object().shape({
-  // businesslegalname: yup.string().required("Business legal name is required"),
-  // businessregistrationnumber: yup
-  //   .string()
-  //   .required("Business registration number is required"),
-  // dateofincorporation: yup
-  //   .date()
-  //   .required("Date of birth is required")
-  //   .nullable()
-  //   .transform((curr, orig) => (orig === "" ? null : curr)),
-  // businessurl: yup.string().required("Business URL is required"),
-  // natureofbusiness: yup
-  //   .string()
-  //   .required("Nature of your business is required"),
-  // businessaddress: yup.string().required("Business address is required"),
-  // businesscity: yup.string().required("City is required"),
-  // businessstate: yup.string().required("State is required"),
-  // businesszip: yup.string().required("Postal code is required"),
+  businesslegalname: yup.string().required('Business legal name is required'),
+  businessregistrationnumber: yup
+    .string()
+    .required('Business registration number is required'),
+  dateofincorporation: yup
+    .date()
+    .required('Date of birth is required')
+    .nullable()
+    .transform((curr, orig) => (orig === '' ? null : curr)),
+  businessurl: yup.string().required('Business URL is required'),
+  natureofbusiness: yup
+    .string()
+    .required('Nature of your business is required'),
+  businessaddress: yup.string().required('Business address is required'),
+  businesscity: yup.string().required('City is required'),
+  businessstate: yup.string().required('State is required'),
+  businesszip: yup.string().required('Postal code is required'),
+  businessfiles: yup
+    .array()
+    .required('The value for proof of bussiness documents cannot be blank'),
 });
 
 const newDate = new Date();
@@ -51,46 +55,30 @@ const BusinessInformation = ({ onBack, onNext, ...rest }) => {
     setSelectedDate(date);
   };
 
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-
-  //   try {
-  //     setSubmitting(true);
-
-  //     // NOTE: Make API request
-
-  //     if (onNext) {
-  //       onNext();
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setError(err.message);
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
-
   const onSubmit = (data) => {
-    console.log("Submit", data);
     if (onNext) {
       onNext();
+      setValues(data);
     }
-    setValues(data);
   };
 
-  const { register, handleSubmit, errors, control, setValue } = useForm({
+  const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {
       businesslegalname: data.businesslegalname,
       businessregistrationnumber: data.businessregistrationnumber,
-      dateofincorporation: data.dateofincorporation,
+      dateofincorporation: format(
+        data.dateofincorporation ? data.dateofincorporation : new Date(),
+        'MM/dd/yyyy'
+      ),
       businessurl: data.businessurl,
       natureofbusiness: data.natureofbusiness,
       businessaddress: data.businessaddress,
       businesscity: data.businesscity,
       businessstate: data.businessstate,
       businesszip: data.businesszip,
+      businessfiles: data.businessfiles,
     },
-    mode: "onBlur",
+    mode: 'onBlur',
     resolver: yupResolver(schema),
   });
 
@@ -169,6 +157,7 @@ const BusinessInformation = ({ onBack, onNext, ...rest }) => {
               name="dateofincorporation"
               label="Select date"
               value={selectedDate}
+              maxDate={new Date()}
               fullWidth
               onChange={handleDateChange}
               error={!!errors.dateofincorporation}
@@ -243,14 +232,29 @@ const BusinessInformation = ({ onBack, onNext, ...rest }) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Controller
-              as={<AddressStateSelect />}
+          <Controller
+              render={(props) => (
+                <Autocomplete
+                  {...props}
+                  options={STATEADDRESS}
+                  getOptionLabel={(option) => option}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Choose a state"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  onChange={(_, data) => props.onChange(data)}
+                />
+              )}
               name="businessstate"
               control={control}
-              error={!!errors.businessstate}
             />
+
             <Box ml={1.8}>
-              {!!errors.state && (
+              {!!errors.businessstate && (
                 <FormHelperText error>{errors?.businessstate?.message}</FormHelperText>
               )}
             </Box>
@@ -259,7 +263,7 @@ const BusinessInformation = ({ onBack, onNext, ...rest }) => {
             <Input
               ref={register}
               name="businesszip"
-              label="ZIP"
+              label="Zip"
               error={!!errors.businesszip}
               helperText={errors?.businesszip?.message}
             />
@@ -274,7 +278,25 @@ const BusinessInformation = ({ onBack, onNext, ...rest }) => {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <FilesDropzone />
+            <Controller
+              name="businessfiles"
+              control={control}
+              render={(props) => (
+                <DropzoneArea
+                  onChange={(e) => props.onChange(e)}
+                  filesLimit={2}
+                  initialFiles={data.businessfiles}
+                  maxFileSize={10000000}
+                />
+              )}
+            />
+            <Box ml={1.8}>
+              {!!errors.businessfiles && (
+                <FormHelperText error>
+                  {errors?.businessfiles?.message}
+                </FormHelperText>
+              )}
+            </Box>
           </Grid>
         </Grid>
       </Box>

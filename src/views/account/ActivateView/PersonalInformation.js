@@ -1,163 +1,94 @@
-import React, { useState, useCallback, useMemo } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import {
   Box,
   Button,
   Typography,
   Grid,
   FormHelperText,
-} from "@material-ui/core";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import { AddressStateSelect } from "src/components/AddressStateSelect";
-import FilesDropzone from "src/components/FilesDropzone";
-import { useDropzone } from "react-dropzone";
-// import Dropzone, { IFileWithMeta, StatusValue } from "react-dropzone-uploader";
-import "react-dropzone-uploader/dist/styles.css";
-import { useForm, Controller } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { Input } from "src/components/Input";
-import { useData } from "src/contexts/UserActivationContext";
-
-// interface IUploads {
-//   files: IFileWithMeta[];
-// }
+  TextField,
+} from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { KeyboardDatePicker } from '@material-ui/pickers';
+import { useForm, Controller } from 'react-hook-form';
+import { DevTool } from '@hookform/devtools';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Input } from 'src/components/Input';
+import { useData } from 'src/contexts/UserActivationContext';
+import { STATEADDRESS } from 'src/constants/addressstate';
+import { format } from 'date-fns';
+import { DropzoneArea } from 'material-ui-dropzone';
 
 const schema = yup.object().shape({
-  // firstname: yup
-  //   .string()
-  //   .matches(/^([^0-9]*)$/, "First name should not contain numbers")
-  //   .required("First name is required"),
-  // lastname: yup
-  //   .string()
-  //   .matches(/^([^0-9]*)$/, "Last name should not contain numbers")
-  //   .required("Last name is required"),
-  // dateofbirth: yup
-  //   .date()
-  //   .required("Date of birth is required")
-  //   .nullable()
-  //   .transform((curr, orig) => (orig === "" ? null : curr)),
-  // address: yup.string().required("Address is required"),
-  // city: yup.string().required("City is required"),
-  // state: yup.string().required("State is required"),
-  // zip: yup.string().required("Postal code is required"),
-  // file: yup.mixed().required("The value for government ID cannot be blank"),
-  // .test("file_size", "The file is too large", (value) => {
-  //   return value && value[0].size <= 10000000;
-  // })
+  firstname: yup
+    .string()
+    .matches(/^([^0-9]*)$/, 'First name should not contain numbers')
+    .required('First name is required'),
+  lastname: yup
+    .string()
+    .matches(/^([^0-9]*)$/, 'Last name should not contain numbers')
+    .required('Last name is required'),
+  dateofbirth: yup
+    .date()
+    .required('Date of birth is required')
+    .nullable()
+    .transform((curr, orig) => (orig === '' ? null : curr)),
+  address: yup.string().required('Address is required'),
+  city: yup.string().required('City is required'),
+  state: yup.string().required('State is required').nullable(),
+  zip: yup.string().required('Postal code is required'),
+  govfiles: yup.array().required('The value for government ID cannot be blank'),
 });
 
 const newDate = new Date();
 
 const PersonalInformation = ({ onBack, onNext, ...rest }) => {
-  const [selectedFile, setSelectedFile] = useState(null);
   const { setValues, data } = useData();
-  const [files, setFiles] = useState({});
   const [isSubmitting, setSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
     newDate.setFullYear(newDate.getFullYear() - 18)
   );
-  const [state, setState] = React.useState("");
 
-  // const handleControlledDropzonChangeStatus = (
-  //   status: StatusValue,
-  //   allFiles: IFileWithMeta[],
-  //   setFiles: Function
-  // ) => {
-  //   setTimeout(() => {
-  //     if (["done", "removed"].includes(status)) {
-  //       setFiles([...allFiles]);
-  //     }
-  //   }, 0);
-  // };
-
-  const { register, handleSubmit, errors, control, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    errors,
+    control,
+  } = useForm({
     defaultValues: {
       firstname: data.firstname,
       lastname: data.lastname,
-      dateofbirth: data.dateofbirth,
+      dateofbirth: format(
+        data.dateofbirth ? data.dateofbirth : new Date(),
+        'MM/dd/yyyy'
+      ),
       address: data.address,
       city: data.city,
       state: data.state,
       zip: data.zip,
-      file: data.file,
+      govfiles: data.govfiles,
     },
-    mode: "onBlur",
+    mode: 'onBlur',
     resolver: yupResolver(schema),
   });
 
-  const handleDrop = useCallback((acceptedFiles) => {
-    // setValue("file", setFiles((prevFiles) => [...prevFiles].concat(acceptedFiles)))
-    setValue("file", acceptedFiles);
-  }, []);
-
-  const {
-    acceptedFiles,
-    getRootProps,
-    getInputProps,
-    isDragAccept,
-  } = useDropzone({
-    onDrop: handleDrop,
-  });
-
-  React.useEffect(() => {
-    register({ name: "file" });
-  }, []);
-
-  React.useEffect(() => {
-    setSelectedFile(acceptedFiles[0]);
-  }, [acceptedFiles]);
-
-  // const files = watch("files");
-
-  // useEffect(() => {
-  //   console.log("files are", files);
-  // }, [files]);
-
-  console.log("ERRORS", errors);
-  console.log("Data", data);
+  console.log('ERRORS', errors);
+  console.log("On submit",data)
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
 
-  const handleStateChange = (event) => {
-    setState(event.target.value);
-  };
-
-  const handleGovidChange = (event) => {
-    const govid = event.target.files[0];
-  };
-
   const onSubmit = (data) => {
-    console.log("Submit", data);
+    console.log("On submit 2.0 ",data)
     if (onNext) {
       onNext();
       setValues(data);
     }
   };
 
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-
-  //   try {
-  //     setSubmitting(true);
-
-  //     // NOTE: Make API request
-
-  //     if (onNext) {
-  //       onNext();
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setError(err.message);
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
   return (
-    // <form onSubmit={handleSubmit} {...rest}>
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <Typography variant="h5" color="textPrimary">
         Your personal information
@@ -211,6 +142,7 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
               name="dateofbirth"
               label="Select date"
               value={selectedDate}
+              maxDate={new Date()}
               fullWidth
               onChange={handleDateChange}
               error={!!errors.dateofbirth}
@@ -247,12 +179,26 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
           </Grid>
           <Grid item xs={12}>
             <Controller
-              as={<AddressStateSelect />}
+              render={(props) => (
+                <Autocomplete
+                  {...props}
+                  options={STATEADDRESS}
+                  getOptionLabel={(option) => option}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Choose a state"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  onChange={(_, data) => props.onChange(data)}
+                />
+              )}
               name="state"
               control={control}
-              error={!!errors.state}
-              helperText={errors?.state?.message}
             />
+
             <Box ml={1.8}>
               {!!errors.state && (
                 <FormHelperText error>{errors?.state?.message}</FormHelperText>
@@ -263,7 +209,7 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
             <Input
               ref={register}
               name="zip"
-              label="ZIP"
+              label="Zip"
               error={!!errors.zip}
               helperText={errors?.zip?.message}
             />
@@ -276,76 +222,26 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
               Please upload one (1) Primary ID or two (2) Secondary IDs (only if
               you cannot provide a primary ID), and make sure they are legible.
               Accepted files are .jpg, .png or .pdf with a file size lower than
-              25 MB.
+              10 MB.
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <div
-              isDragAccept={isDragAccept}
-              {...getRootProps({ onClick: (e) => e.preventDefault() })}
-            >
-              <p>Drag 'n' drop file here, or click to select file</p>
-
-              <input
-                type="file"
-                name="file"
-                // onChange={e => changeFile(e)}
-                {...getInputProps()}
-              />
-            </div>
-
-            {/* <FilesDropzone /> */}
-            {/* <Input ref={register} type="file" name="govimage" /> */}
-            {/* <Controller
+            <Controller
+              name="govfiles"
               control={control}
-              name="files"
-              render={({ onChange }) => (
-                <Dropzone
-                  onChangeStatus={(file, status, allFiles) => {
-                    handleControlledDropzonChangeStatus(
-                      status,
-                      allFiles,
-                      onChange
-                    );
-                  }}
+              render={(props) => (
+                <DropzoneArea onChange={(e) => props.onChange(e)}
+                filesLimit={2}
+                initialFiles={data.govfiles}
+                maxFileSize={10000000}
                 />
               )}
             />
-
-            <Typography variant="h6" color="textPrimary">
-              Files are:
-            </Typography>
-            <ol>{files && files.map((file) => <li>{file.meta.name}</li>)}</ol> */}
-            {/* <Controller
-              name="govfiles"
-              control={control}
-              render={({ onChange }) => <FilesDropzone onChange={onChange} />}
-            /> */}
-
-            {/* <Controller
-              name="govfiles"
-              control={control}
-              defaultValue=""
-              render={({ onChange }) => <Dropzone onChange={onChange} />}
-            /> */}
-
-            {/* <input type="file" name="govid" onchange={handleGovidChange} ref={register} /> */}
-
-            {/* <Controller
-              name="govfiles"
-              control={control}
-              defaultValue=""
-              render={({ onChange }) => <Dropzone onChange={onChange} />}
-            /> */}
-
-            {/* <label htmlFor="contained-button-file">
-                <Button variant="contained" component="span">
-                  Upload
-                </Button>
-              </label> */}
             <Box ml={1.8}>
-              {!!errors.file && (
-                <FormHelperText error>{errors?.file?.message}</FormHelperText>
+              {!!errors.govfiles && (
+                <FormHelperText error>
+                  {errors?.govfiles?.message}
+                </FormHelperText>
               )}
             </Box>
           </Grid>
