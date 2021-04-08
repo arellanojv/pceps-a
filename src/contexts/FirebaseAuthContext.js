@@ -56,31 +56,27 @@ export const AuthProvider = ({ children }) => {
     type,
     phone
   ) => {
-    try {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then((cred) => {
-          firebase.firestore().collection("users").doc(cred.user.uid).set({
-            type: type,
-            phone: phone,
-          });
-          //send email verification
-          const currentUser = firebase.auth().currentUser;
-          if (!currentUser.emailVerified) {
-            currentUser
-              .sendEmailVerification()
-              .then(function () {
-                console.log("Email Verification Sent");
-              })
-              .catch(function (error) {
-                // An error happened.
-              });
-          }
+    return firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then((cred) => {
+        firebase.firestore().collection("users").doc(cred.user.uid).set({
+          type: type,
+          phone: phone,
         });
-    } catch (err) {
-      console.log(err);
-    }
+        //send email verification
+        const currentUser = firebase.auth().currentUser;
+        if (!currentUser.emailVerified) {
+          currentUser
+            .sendEmailVerification()
+            .then(function () {
+              console.log("Email Verification Sent");
+            })
+            .catch(function (error) {
+              // An error happened.
+            });
+        }
+      });
   };
 
   const logout = () => {
@@ -99,8 +95,6 @@ export const AuthProvider = ({ children }) => {
           .doc(user.uid)
           .get()
           .then((userDoc) => {
-            console.log("User Collection Data:", userDoc.data().type);
-            console.log("Is Verified:", user.emailVerified);
             dispatch({
               type: "AUTH_STATE_CHANGED",
               payload: {
@@ -111,6 +105,8 @@ export const AuthProvider = ({ children }) => {
                   email: user.email,
                   name: user.displayName || user.email,
                   tier: "Premium",
+                  phone: user.phone,
+                  type: user.type,
                   blocking: user.emailVerified,
                 },
               },

@@ -1,7 +1,4 @@
-import React, {
-  useState,
-  useCallback
-} from 'react';
+import React, { useState, useCallback } from 'react';
 import clsx from 'clsx';
 import { useDropzone } from 'react-dropzone';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -17,7 +14,7 @@ import {
   ListItemText,
   Tooltip,
   Typography,
-  makeStyles
+  makeStyles,
 } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import MoreIcon from '@material-ui/icons/MoreVert';
@@ -36,33 +33,33 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: theme.palette.action.hover,
       opacity: 0.5,
-      cursor: 'pointer'
-    }
+      cursor: 'pointer',
+    },
   },
   dragActive: {
     backgroundColor: theme.palette.action.active,
-    opacity: 0.5
+    opacity: 0.5,
   },
   image: {
-    width: 130
+    width: 130,
   },
   info: {
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   list: {
-    maxHeight: 320
+    maxHeight: 320,
   },
   actions: {
     marginTop: theme.spacing(2),
     display: 'flex',
     justifyContent: 'flex-end',
     '& > * + *': {
-      marginLeft: theme.spacing(2)
-    }
-  }
+      marginLeft: theme.spacing(2),
+    },
+  },
 }));
 
-const FilesDropzone = ({ className, ...rest }) => {
+const FilesDropzone = ({ className, onChange, ...rest }) => {
   const classes = useStyles();
   const [files, setFiles] = useState([]);
 
@@ -75,22 +72,21 @@ const FilesDropzone = ({ className, ...rest }) => {
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: handleDrop
+    noDrag: true,
+    maxFiles:2,
+    onDrop: handleDrop,
   });
 
   return (
-    <div
-      className={clsx(classes.root, className)}
-      {...rest}
-    >
+    <div className={clsx(classes.root, className)} {...rest}>
       <div
         className={clsx({
           [classes.dropZone]: true,
-          [classes.dragActive]: isDragActive
+          [classes.dragActive]: isDragActive,
         })}
         {...getRootProps()}
       >
-        <input {...getInputProps()} />
+        <input {...getInputProps({ onChange })} />
         <div>
           <img
             alt="Select file"
@@ -99,22 +95,13 @@ const FilesDropzone = ({ className, ...rest }) => {
           />
         </div>
         <div>
-          <Typography
-            gutterBottom
-            variant="h3"
-          >
+          <Typography gutterBottom variant="h3">
             Select files
           </Typography>
           <Box mt={2}>
-            <Typography
-              color="textPrimary"
-              variant="body1"
-            >
-              Drop files here or click
-              {' '}
-              <Link underline="always">browse</Link>
-              {' '}
-              through your machine
+            <Typography color="textPrimary" variant="body1">
+              Drop files here or click <Link underline="always">browse</Link>{' '}
+              thorough your machine
             </Typography>
           </Box>
         </div>
@@ -124,10 +111,7 @@ const FilesDropzone = ({ className, ...rest }) => {
           <PerfectScrollbar options={{ suppressScrollX: true }}>
             <List className={classes.list}>
               {files.map((file, i) => (
-                <ListItem
-                  divider={i < files.length - 1}
-                  key={i}
-                >
+                <ListItem divider={i < files.length - 1} key={i}>
                   <ListItemIcon>
                     <FileCopyIcon />
                   </ListItemIcon>
@@ -146,17 +130,10 @@ const FilesDropzone = ({ className, ...rest }) => {
             </List>
           </PerfectScrollbar>
           <div className={classes.actions}>
-            <Button
-              onClick={handleRemoveAll}
-              size="small"
-            >
+            <Button onClick={handleRemoveAll} size="small">
               Remove all
             </Button>
-            <Button
-              color="secondary"
-              size="small"
-              variant="contained"
-            >
+            <Button color="secondary" size="small" variant="contained">
               Upload files
             </Button>
           </div>
@@ -167,7 +144,7 @@ const FilesDropzone = ({ className, ...rest }) => {
 };
 
 FilesDropzone.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 
 export default FilesDropzone;

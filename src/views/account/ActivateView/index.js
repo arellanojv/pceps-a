@@ -25,7 +25,7 @@ import {
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import {
   User as UserIcon,
-  Star as StarIcon,
+  Check as CheckIcon,
   Briefcase as BriefcaseIcon,
   File as FileIcon,
 } from "react-feather";
@@ -34,7 +34,8 @@ import PersonalInformation from "./PersonalInformation";
 import BusinessInformation from "./BusinessInformation";
 import StatementOfAcceptance from "./StatementOfAcceptance";
 import BlockIt from "src/components/BlockIt";
-import useAuth from 'src/hooks/useAuth';
+import useAuth from "src/hooks/useAuth";
+import { DataProvider } from "src/contexts/UserActivationContext";
 
 const steps = [
   {
@@ -105,7 +106,7 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(3),
   },
   avatar: {
-    backgroundColor: colors.red[600],
+    backgroundColor: colors.green[600],
   },
   stepper: {
     backgroundColor: "transparent",
@@ -182,21 +183,23 @@ const ActivateView = () => {
                 </Grid>
                 <Grid item xs={12} md={9}>
                   <Box p={3}>
-                    {activeStep === 0 && (
-                      <PersonalInformation onNext={handleNext} />
-                    )}
-                    {activeStep === 1 && (
-                      <BusinessInformation
-                        onBack={handleBack}
-                        onNext={handleNext}
-                      />
-                    )}
-                    {activeStep === 2 && (
-                      <StatementOfAcceptance
-                        onBack={handleBack}
-                        onComplete={handleComplete}
-                      />
-                    )}
+                    <DataProvider>
+                      {activeStep === 0 && (
+                        <PersonalInformation onNext={handleNext} />
+                      )}
+                      {activeStep === 1 && (
+                        <BusinessInformation
+                          onBack={handleBack}
+                          onNext={handleNext}
+                        />
+                      )}
+                      {activeStep === 2 && (
+                        <StatementOfAcceptance
+                          onBack={handleBack}
+                          onComplete={handleComplete}
+                        />
+                      )}
+                    </DataProvider>
                   </Box>
                 </Grid>
               </Grid>
@@ -207,7 +210,7 @@ const ActivateView = () => {
                 <Box maxWidth={450} mx="auto">
                   <Box display="flex" justifyContent="center">
                     <Avatar className={classes.avatar}>
-                      <StarIcon />
+                      <CheckIcon />
                     </Avatar>
                   </Box>
                   <Box mt={2}>
@@ -221,8 +224,8 @@ const ActivateView = () => {
                       color="textSecondary"
                       align="center"
                     >
-                      Donec ut augue sed nisi ullamcorper posuere sit amet eu
-                      mauris. Ut eget mauris scelerisque.
+                      Thank you for submitting the required information to activate your account.
+                      We will notify you via email once account is approved.
                     </Typography>
                   </Box>
                   <Box mt={2} display="flex" justifyContent="center">
@@ -230,9 +233,9 @@ const ActivateView = () => {
                       variant="contained"
                       color="secondary"
                       component={RouterLink}
-                      to="/app/projects/1"
+                      to="/"
                     >
-                      View your project
+                      View Purchase Requests
                     </Button>
                   </Box>
                 </Box>
