@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import {
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     float: 'right',
   },
   signTextField: {
-    display: 'block',
+    display: 'none',
   },
 }));
 
@@ -50,9 +50,17 @@ const StatementOfAcceptance = ({ className, onBack, onComplete, ...rest }) => {
   const [signatureDataUrl, setSignatureDataUrl] = useState('');
   const { setValues, data } = useData();
   const [isSubmitting, setSubmitting] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState('Complete');
   const [error, setError] = useState(null);
   const signPad = useRef({});
   const { user } = useAuth();
+  const [govFilesUrl, setGovFilesUrl] = useState([]);
+  const [bizFilesUrl, setbizFilesUrl] = useState([]);
+  const [signFile, setSignFile] = useState([]);
+  const [uploadExecuted, setUploadExecution] = useState(0);
+
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
   const { register, handleSubmit, errors, reset } = useForm({
     mode: 'onBlur',
@@ -67,11 +75,31 @@ const StatementOfAcceptance = ({ className, onBack, onComplete, ...rest }) => {
     });
   };
 
-  const handlePenLift = () => {
+  const handlePenLift = async () => {
     setSignatureDataUrl(
       signPad.current.getTrimmedCanvas().toDataURL('image/png')
     );
-    console.log(signatureDataUrl);
+
+    if (!uploadExecuted) {
+      setButtonLabel('PLease wait...');
+      govFilesUpload();
+      bizFilesUpload();
+      setUploadExecution(1);
+    }
+
+    const signatureFile = signPad.current.getTrimmedCanvas().toDataURL();
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child('signatures/' + user.id + '.jpg');
+    try {
+      setSubmitting(true);
+      await fileRef.putString(signatureFile, 'data_url');
+      setSignFile(await fileRef.getDownloadURL());
+      setButtonLabel('Complete');
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handlePenDrop = () => {
@@ -85,86 +113,106 @@ const StatementOfAcceptance = ({ className, onBack, onComplete, ...rest }) => {
     setContent(value);
   };
 
-  const onSubmit = () => {
-    console.log('Submit', data);
-    // return firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(user.id)
-    //   .update({
-    //     //Mo error if some of the data are empty
-    //     firstname: data.firstname,
-    //     lastname: data.lastname,
-    //     dateofbirth: data.dateofbirth,
-    //     address: data.address,
-    //     city: data.city,
-    //     state: data.state,
-    //     zip: data.zip,
-    //     businesslegalname: data.businesslegalname,
-    //     businessregistrationnumber: data.businessregistrationnumber,
-    //     dateofincorporation: data.dateofincorporation,
-    //     businessurl: data.businessurl,
-    //     natureofbusiness: data.natureofbusiness,
-    //     businessaddress: data.businessaddress,
-    //     businesscity: data.businesscity,
-    //     businessstate: data.businessstate,
-    //     businesszip: data.businesszip,
-    //   })
-    //   .then(() => {
-    //     emailjs
-    //       .send(
-    //         'default_service',
-    //         'template_lo22zvh',
-    //         {
-    //           userFirstName: data.firstname,
-    //           userEmailTo: 'jahan.arellano@gmail.com',
-    //         },
-    //         'user_DuGSqe4pNtH8qXOYaWunO'
-    //       )
-    //       .then((res) => {
-    //         if (res.status === 200) {
-    //           console.log('Email Sent');
-    //         }
-    //       })
-    //       .catch((err) =>
-    //         console.error('Failed to send feedback. Error: ', err)
-    //       );
-
-    //     // sendConfirmationEmail(
-    //     //   'template_lo22zvh',
-    //     //   userfirstName,
-    //     //   userLastName,
-    //     //   'user_DuGSqe4pNtH8qXOYaWunO'
-    //     // );
-
-    //     if (onComplete) {
-    //       onComplete();
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     // The document probably doesn't exist.
-    //     console.error('Error updating document: ', error);
-    //   });
+  const govFilesUpload = async () => {
+    const files = data.govfiles;
+    files.map(async (file) => {
+      const storageRef = storage.ref();
+      const fileRef = storageRef.child('id/' + file.name);
+      try {
+        setSubmitting(true);
+        await fileRef.put(file);
+        const uploadedFileURL = await fileRef.getDownloadURL();
+        setGovFilesUrl((govFilesUrl) => [...govFilesUrl, uploadedFileURL]);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setSubmitting(false);
+      }
+    });
   };
 
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
+  const bizFilesUpload = () => {
+    const files = data.businessfiles;
+    files.map(async (file) => {
+      const storageRef = storage.ref();
+      const fileRef = storageRef.child('business/' + file.name);
+      try {
+        setSubmitting(true);
+        await fileRef.put(file);
+        const uploadedFileURL = await fileRef.getDownloadURL();
+        setbizFilesUrl((bizFilesUrl) => [...bizFilesUrl, uploadedFileURL]);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setSubmitting(false);
+      }
+    });
+  };
 
-  //   try {
-  //     setSubmitting(true);
+  const onSubmit = async () => {
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(user.id)
+      .update({
+        // Mo error if some of the data are empty
+        firstname: data.firstname,
+        lastname: data.lastname,
+        dateofbirth: data.dateofbirth,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        zip: data.zip,
+        businesslegalname: data.businesslegalname,
+        businessregistrationnumber: data.businessregistrationnumber,
+        dateofincorporation: data.dateofincorporation,
+        businessurl: data.businessurl,
+        natureofbusiness: data.natureofbusiness,
+        businessaddress: data.businessaddress,
+        businesscity: data.businesscity,
+        businessstate: data.businessstate,
+        businesszip: data.businesszip,
+        govfiles: govFilesUrl,
+        businessfiles: bizFilesUrl,
+        signature: signFile,
+        status: 'Inactive'
+      })
+      .then(() => {
+        emailjs
+          .send(
+            'default_service',
+            'template_lo22zvh',
+            {
+              userFirstName: data.firstname,
+              userEmailTo: user.email,
+            },
+            'user_DuGSqe4pNtH8qXOYaWunO'
+          )
+          .then((res) => {
+            if (res.status === 200) {
+              console.log('Email Sent');
+            }
+          })
+          .catch((err) =>
+            console.error('Failed to send feedback. Error: ', err)
+          );
 
-  //     // NOTE: Make API request
+        // sendConfirmationEmail(
+        //   'template_lo22zvh',
+        //   userfirstName,
+        //   userLastName,
+        //   'user_DuGSqe4pNtH8qXOYaWunO'
+        // );
 
-  //     if (onComplete) {
-  //       onComplete();
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setError(err.message);
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
+        if (onComplete) {
+          onComplete();
+        }
+      })
+      .catch((error) => {
+        // The document probably doesn't exist.
+        console.error('Error updating document: ', error);
+      });
+  };
 
   return (
     <form
@@ -417,7 +465,7 @@ const StatementOfAcceptance = ({ className, onBack, onComplete, ...rest }) => {
           variant="contained"
           size="large"
         >
-          Complete
+          {buttonLabel}
         </Button>
       </Box>
     </form>

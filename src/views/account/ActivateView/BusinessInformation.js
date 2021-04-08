@@ -54,7 +54,7 @@ const BusinessInformation = ({ onBack, onNext, ...rest }) => {
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
-
+ 
   const onSubmit = (data) => {
     if (onNext) {
       onNext();
