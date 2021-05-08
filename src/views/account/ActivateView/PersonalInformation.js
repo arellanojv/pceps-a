@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -11,7 +11,6 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { useForm, Controller } from 'react-hook-form';
-import { DevTool } from '@hookform/devtools';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Input } from 'src/components/Input';
@@ -43,19 +42,14 @@ const schema = yup.object().shape({
 
 const newDate = new Date();
 
-const PersonalInformation = ({ onBack, onNext, ...rest }) => {
+const PersonalInformation = ({ onBack, onNext }) => {
   const { setValues, data } = useData();
   const [isSubmitting, setSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
     newDate.setFullYear(newDate.getFullYear() - 18)
   );
 
-  const {
-    register,
-    handleSubmit,
-    errors,
-    control,
-  } = useForm({
+  const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {
       firstname: data.firstname,
       lastname: data.lastname,
@@ -74,14 +68,14 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
   });
 
   console.log('ERRORS', errors);
-  console.log("On submit",data)
+  console.log('On submit', data);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
 
   const onSubmit = (data) => {
-    console.log("On submit 2.0 ",data)
+    console.log('On submit 2.0 ', data);
     if (onNext) {
       onNext();
       setValues(data);
@@ -190,6 +184,7 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
                       label="Choose a state"
                       variant="outlined"
                       size="small"
+                      error={!!errors.state}
                     />
                   )}
                   onChange={(_, data) => props.onChange(data)}
@@ -230,10 +225,11 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
               name="govfiles"
               control={control}
               render={(props) => (
-                <DropzoneArea onChange={(e) => props.onChange(e)}
-                filesLimit={2}
-                initialFiles={data.govfiles}
-                maxFileSize={10000000}
+                <DropzoneArea
+                  onChange={(e) => props.onChange(e)}
+                  filesLimit={2}
+                  initialFiles={data.govfiles}
+                  maxFileSize={10000000}
                 />
               )}
             />
@@ -258,7 +254,6 @@ const PersonalInformation = ({ onBack, onNext, ...rest }) => {
         >
           Next
         </Button>
-        <DevTool control={control} />
       </Box>
     </form>
   );

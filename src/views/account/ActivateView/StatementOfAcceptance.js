@@ -159,23 +159,27 @@ const StatementOfAcceptance = ({ className, onBack, onComplete, ...rest }) => {
         firstname: data.firstname,
         lastname: data.lastname,
         dateofbirth: data.dateofbirth,
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        zip: data.zip,
+        full_address: {
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zip: data.zip,
+        },
         businesslegalname: data.businesslegalname,
         businessregistrationnumber: data.businessregistrationnumber,
         dateofincorporation: data.dateofincorporation,
         businessurl: data.businessurl,
         natureofbusiness: data.natureofbusiness,
-        businessaddress: data.businessaddress,
-        businesscity: data.businesscity,
-        businessstate: data.businessstate,
-        businesszip: data.businesszip,
+        biz_full_address: {
+          businessaddress: data.businessaddress,
+          businesscity: data.businesscity,
+          businessstate: data.businessstate,
+          businesszip: data.businesszip,
+        },
         govfiles: govFilesUrl,
         businessfiles: bizFilesUrl,
         signature: signFile,
-        status: 'Inactive'
+        status: 'Inactive',
       })
       .then(() => {
         emailjs
