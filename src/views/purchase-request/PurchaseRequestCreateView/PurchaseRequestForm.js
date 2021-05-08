@@ -1,43 +1,85 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { Box, Button, Typography, Grid, TextField } from "@material-ui/core";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import { AddressStateSelect } from "src/components/AddressStateSelect";
-import { JobCategory } from "src/components/JobCategory";
-import CurrencyTextField from "@unicef/material-ui-currency-textfield";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import {
+  Box,
+  Button,
+  Typography,
+  Grid,
+  TextField,
+  FormHelperText,
+} from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { KeyboardDatePicker } from '@material-ui/pickers';
+import CurrencyTextField from '@unicef/material-ui-currency-textfield';
+import * as yup from 'yup';
+import { Input } from 'src/components/Input';
+import { format } from 'date-fns';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { usePurchaseRequest } from 'src/contexts/PurchaseRequestContext';
+import { CATEGORIES } from 'src/constants/categories';
+import { STATEADDRESS } from 'src/constants/addressstate';
+import { DropzoneArea } from 'material-ui-dropzone';
+import { DevTool } from '@hookform/devtools';
 
-const PurchaseRequestForm = ({ onBack, onNext, ...rest }) => {
+const schema = yup.object().shape({
+  title: yup.string().required('Title is required'),
+  description: yup.string().required('Project description is required'),
+  budget: yup.string().required('Budget is required'),
+  category: yup.string().required('Category is required').nullable(),
+  projectdeadline: yup
+    .date()
+    .required('Project deadline is required')
+    .nullable()
+    .transform((curr, orig) => (orig === '' ? null : curr)),
+  address: yup.string().required('Address is required'),
+  city: yup.string().required('City is required'),
+  state: yup.string().required('State is required').nullable(),
+  zip: yup.string().required('Postal code is required'),
+  projectimages: yup
+    .array()
+    .required('The value for government ID cannot be blank'),
+  projectdocuments: yup
+    .array()
+    .required('The value for government ID cannot be blank'),
+});
+
+const PurchaseRequestForm = ({ onNext }) => {
+  const { data, setValues } = usePurchaseRequest();
   const [isSubmitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date("1994-08-18T21:11:54")
-  );
-  const [value, setValue] = useState();
+  const [selectedDate, setSelectedDate] = useState();
+
+  const { register, handleSubmit, errors, control } = useForm({
+    defaultValues: {
+      title: data.title,
+      description: data.description,
+      budget: data.budget,
+      category: data.category,
+      projectdeadline: format(
+        data.projectdeadline ? data.projectdeadline : new Date(),
+        'MM/dd/yyyy'
+      ),
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      zip: data.zip,
+    },
+    mode: 'onBlur',
+    resolver: yupResolver(schema),
+  });
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    try {
-      setSubmitting(true);
-
-      // NOTE: Make API request
-
-      if (onNext) {
-        onNext();
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
+  const onSubmit = (data) => {
+    if (onNext) {
+      onNext();
+      setValues(data);
     }
   };
   return (
-    <form onSubmit={handleSubmit} {...rest}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Typography variant="h5" color="textPrimary">
         Purchase request information
       </Typography>
@@ -50,12 +92,33 @@ const PurchaseRequestForm = ({ onBack, onNext, ...rest }) => {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
-              fullWidth
+            <Input
+              ref={register}
+              id="title"
+              type="text"
+              label="eg: Purchase of Cement for Concreting of Pathway to Purok 1"
               name="title"
-              label="Title"
-              variant="outlined"
-              size="small"
+              error={!!errors.title}
+              helperText={errors?.title?.message}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography variant="h6" color="textPrimary">
+              Description
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Input
+              ref={register}
+              name="description"
+              id="description"
+              label="Describe here your project scope"
+              multiline
+              rows={8}
+              rowsMax={10}
+              error={!!errors.description}
+              helperText={errors?.description?.message}
             />
           </Grid>
 
@@ -66,82 +129,215 @@ const PurchaseRequestForm = ({ onBack, onNext, ...rest }) => {
           </Grid>
 
           <Grid item xs={12}>
-            <CurrencyTextField
-              fullWidth
-              size="small"
-              label="Amount"
-              variant="outlined"
-              value={value}
-              currencySymbol="₱"
-              //minimumValue="0"
-              outputFormat="string"
-              decimalCharacter="."
-              digitGroupSeparator=","
-              onChange={(event, value) => setValue(value)}
+            <Controller
+              render={(props) => (
+                <CurrencyTextField
+                  fullWidth
+                  size="small"
+                  label="Amount"
+                  variant="outlined"
+                  value={data.budget}
+                  error={!!errors.budget}
+                  currencySymbol="₱"
+                  minimumValue={0}
+                  outputFormat="string"
+                  decimalCharacter="."
+                  digitGroupSeparator=","
+                  onChange={(_, data) => props.onChange(data)}
+                />
+              )}
+              name="budget"
+              control={control}
             />
+
+            <Box ml={1.8}>
+              {!!errors.budget && (
+                <FormHelperText error>{errors?.budget?.message}</FormHelperText>
+              )}
+            </Box>
           </Grid>
 
           <Grid item xs={12}>
-            <JobCategory />
+            <Controller
+              render={(props) => (
+                <Autocomplete
+                  {...props}
+                  options={CATEGORIES}
+                  getOptionLabel={(option) => option}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Choose a category"
+                      variant="outlined"
+                      size="small"
+                      error={!!errors.category}
+                    />
+                  )}
+                  onChange={(_, data) => props.onChange(data)}
+                />
+              )}
+              name="category"
+              control={control}
+            />
+
+            <Box ml={1.8}>
+              {!!errors.category && (
+                <FormHelperText error>
+                  {errors?.category?.message}
+                </FormHelperText>
+              )}
+            </Box>
           </Grid>
 
           <Grid item xs={12}>
             <Typography variant="h6" color="textPrimary">
-              Bid Deadline
+              Project deadline
             </Typography>
             <KeyboardDatePicker
+              inputRef={register}
               margin="normal"
               inputVariant="outlined"
               size="small"
               format="MM/DD/yyyy"
-              id="biddeadline"
+              id="projectdeadline"
+              name="projectdeadline"
               label="Select date"
               value={selectedDate}
+              minDate={new Date()}
               fullWidth
               onChange={handleDateChange}
+              error={!!errors.projectdeadline}
+              helperText={errors?.projectdeadline?.message}
             />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h6" color="textPrimary">
-              Address
+              Project address
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
+            <Input
+              ref={register}
               name="address"
+              id="address"
               label="Address"
-              variant="outlined"
-              size="small"
               placeholder="Unit number, Building name, Street name, etc.,"
               multiline
               rows={5}
               rowsMax={10}
+              error={!!errors.address}
+              helperText={errors?.address?.message}
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
+            <Input
+              ref={register}
               name="city"
               label="City"
-              variant="outlined"
-              size="small"
+              error={!!errors.city}
+              helperText={errors?.city?.message}
             />
           </Grid>
           <Grid item xs={12}>
-            <AddressStateSelect />
+            <Controller
+              render={(props) => (
+                <Autocomplete
+                  {...props}
+                  options={STATEADDRESS}
+                  getOptionLabel={(option) => option}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Choose a state"
+                      variant="outlined"
+                      size="small"
+                      error={!!errors.state}
+                    />
+                  )}
+                  onChange={(_, data) => props.onChange(data)}
+                />
+              )}
+              name="state"
+              control={control}
+            />
+
+            <Box ml={1.8}>
+              {!!errors.state && (
+                <FormHelperText error>{errors?.state?.message}</FormHelperText>
+              )}
+            </Box>
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
+            <Input
+              ref={register}
               name="zip"
-              label="ZIP"
-              variant="outlined"
-              size="small"
+              label="Zip"
+              error={!!errors.zip}
+              helperText={errors?.zip?.message}
             />
           </Grid>
         </Grid>
+
+        <Box mt={2}>
+          <Typography variant="h6" color="textPrimary">
+            Project images
+          </Typography>
+        </Box>
+
+        <Grid item xs={12}>
+          <Controller
+            name="projectimages"
+            control={control}
+            render={(props) => (
+              <DropzoneArea
+                onChange={(e) => props.onChange(e)}
+                filesLimit={10}
+                initialFiles={data.projectimages}
+                maxFileSize={10000000}
+                showFileNames={true}
+                acceptedFiles={['image/jpeg', 'image/png', '.pdf']}
+              />
+            )}
+          />
+          <Box ml={1.8}>
+            {!!errors.projectimages && (
+              <FormHelperText error>
+                {errors?.projectimages?.message}
+              </FormHelperText>
+            )}
+          </Box>
+        </Grid>
+
+        <Box mt={2}>
+          <Typography variant="h6" color="textPrimary">
+            Project documents
+          </Typography>
+        </Box>
+
+        <Grid item xs={12}>
+          <Controller
+            name="projectdocuments"
+            control={control}
+            render={(props) => (
+              <DropzoneArea
+                onChange={(e) => props.onChange(e)}
+                filesLimit={10}
+                initialFiles={data.projectdocuments}
+                maxFileSize={10000000}
+                showFileNames={true}
+              />
+            )}
+          />
+          <Box ml={1.8}>
+            {!!errors.projectdocuments && (
+              <FormHelperText error>
+                {errors?.projectdocuments?.message}
+              </FormHelperText>
+            )}
+          </Box>
+        </Grid>
       </Box>
+      <DevTool control={control} />
       <Box mt={6} display="flex">
         <Box flexGrow={1} />
         <Button

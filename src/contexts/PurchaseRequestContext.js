@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
 
-const UserActivationContext = createContext();
+const PurchaseRequestContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [data, setData] = useState({});
@@ -13,10 +13,11 @@ export const DataProvider = ({ children }) => {
   };
 
   return (
-    <UserActivationContext.Provider value={{ data, setValues }}>
-      {children}
-    </UserActivationContext.Provider>
+      <PurchaseRequestContext.Provider value={{ data, setValues }}>
+        {children}
+      </PurchaseRequestContext.Provider>
   );
 };
 
-export const useData = () => useContext(UserActivationContext);
+export const usePurchaseRequest = () => useContext(PurchaseRequestContext);
+  

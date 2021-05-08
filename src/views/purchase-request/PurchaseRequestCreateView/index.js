@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import clsx from "clsx";
-import PropTypes from "prop-types";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useState } from 'react';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Avatar,
   Box,
@@ -21,31 +21,29 @@ import {
   colors,
   makeStyles,
   withStyles,
-} from "@material-ui/core";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
+} from '@material-ui/core';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import {
   User as UserIcon,
   Star as StarIcon,
   Briefcase as BriefcaseIcon,
   File as FileIcon,
-} from "react-feather";
-import Page from "src/components/Page";
-import UserDetails from "./UserDetails";
-import ProjectDescription from "./ProjectDescription";
-import PurchaseRequestForm from "./PurchaseRequestForm";
-import ScopeOfWork from "./ScopeOfWork";
+} from 'react-feather';
+import Page from 'src/components/Page';
+import UserDetails from './UserDetails';
+import ProjectDescription from './ProjectDescription';
+import PurchaseRequestForm from './PurchaseRequestForm';
+import ScopeOfWork from './ScopeOfWork';
+import { DataProvider } from 'src/contexts/PurchaseRequestContext';
+import Preview from './Preview';
 
 const steps = [
   {
-    label: "Purchase Request Details",
+    label: 'Purchase Request Details',
     icon: BriefcaseIcon,
   },
   {
-    label: "Scope of Work",
-    icon: BriefcaseIcon,
-  },
-  {
-    label: "Confirmation",
+    label: 'Preview',
     icon: BriefcaseIcon,
   },
 ];
@@ -99,7 +97,7 @@ CustomStepIcon.propTypes = {
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.background.dark,
-    minHeight: "100%",
+    minHeight: '100%',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
   },
@@ -107,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: colors.red[600],
   },
   stepper: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
   },
 }));
 
@@ -129,7 +127,7 @@ const PurchaseRequestCreateView = () => {
   };
 
   return (
-    <Page className={classes.root} title="Project Create">
+    <Page className={classes.root} title="PCEPS | Create Purchase Request">
       <Container maxWidth="lg">
         <Box mb={3}>
           <Breadcrumbs
@@ -170,18 +168,23 @@ const PurchaseRequestCreateView = () => {
               </Grid>
               <Grid item xs={12} md={9}>
                 <Box p={3}>
-                  {activeStep === 0 && (
-                    <PurchaseRequestForm onNext={handleNext} />
-                  )}
-                  {activeStep === 1 && (
-                    <ScopeOfWork onBack={handleBack} onNext={handleNext} />
-                  )}
-                  {activeStep === 2 && (
-                    <ProjectDescription
-                      onBack={handleBack}
-                      onComplete={handleComplete}
-                    />
-                  )}
+                  <DataProvider>
+                    {activeStep === 0 && (
+                      <PurchaseRequestForm onNext={handleNext} />
+                    )}
+                    {activeStep === 1 && (
+                      <Preview
+                        onBack={handleBack}
+                        onComplete={handleComplete}
+                      />
+                    )}
+                    {/* {activeStep === 2 && (
+                      <ProjectDescription
+                        onBack={handleBack}
+                        onComplete={handleComplete}
+                      />
+                    )} */}
+                  </DataProvider>
                 </Box>
               </Grid>
             </Grid>
