@@ -25,7 +25,7 @@ import {
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import {
   User as UserIcon,
-  Star as StarIcon,
+  Check as CheckIcon,
   Briefcase as BriefcaseIcon,
   File as FileIcon,
 } from 'react-feather';
@@ -102,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(3),
   },
   avatar: {
-    backgroundColor: colors.red[600],
+    backgroundColor: colors.green[600],
   },
   stepper: {
     backgroundColor: 'transparent',
@@ -195,7 +195,7 @@ const PurchaseRequestCreateView = () => {
               <Box maxWidth={450} mx="auto">
                 <Box display="flex" justifyContent="center">
                   <Avatar className={classes.avatar}>
-                    <StarIcon />
+                    <CheckIcon />
                   </Avatar>
                 </Box>
                 <Box mt={2}>
@@ -209,8 +209,7 @@ const PurchaseRequestCreateView = () => {
                     color="textSecondary"
                     align="center"
                   >
-                    Donec ut augue sed nisi ullamcorper posuere sit amet eu
-                    mauris. Ut eget mauris scelerisque.
+                    Thank you for posting.
                   </Typography>
                 </Box>
                 <Box mt={2} display="flex" justifyContent="center">
@@ -220,7 +219,7 @@ const PurchaseRequestCreateView = () => {
                     component={RouterLink}
                     to="/app/projects/1"
                   >
-                    View your project
+                    View your Purchase request
                   </Button>
                 </Box>
               </Box>
