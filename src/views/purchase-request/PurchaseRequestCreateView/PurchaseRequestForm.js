@@ -25,7 +25,7 @@ import { DevTool } from '@hookform/devtools';
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
   description: yup.string().required('Project description is required'),
-  budget: yup.string().required('Budget is required'),
+  budget: yup.number().required('Budget is required').integer('Amount in centavo is not allowed'),
   category: yup.string().required('Category is required').nullable(),
   projectdeadline: yup
     .date()
@@ -36,10 +36,7 @@ const schema = yup.object().shape({
   city: yup.string().required('City is required'),
   state: yup.string().required('State is required').nullable(),
   zip: yup.string().required('Postal code is required'),
-  projectimages: yup
-    .array()
-    .required('The value for government ID cannot be blank'),
-  projectdocuments: yup
+  projectfiles: yup
     .array()
     .required('The value for government ID cannot be blank'),
 });
@@ -280,19 +277,19 @@ const PurchaseRequestForm = ({ onNext }) => {
 
         <Box mt={2}>
           <Typography variant="h6" color="textPrimary">
-            Project images
+            Project files (Upload Images / PDFs Here)
           </Typography>
         </Box>
 
         <Grid item xs={12}>
           <Controller
-            name="projectimages"
+            name="projectfiles"
             control={control}
             render={(props) => (
               <DropzoneArea
                 onChange={(e) => props.onChange(e)}
                 filesLimit={10}
-                initialFiles={data.projectimages}
+                initialFiles={data.projectfiles}
                 maxFileSize={10000000}
                 showFileNames={true}
                 acceptedFiles={['image/jpeg', 'image/png', '.pdf']}
@@ -300,42 +297,15 @@ const PurchaseRequestForm = ({ onNext }) => {
             )}
           />
           <Box ml={1.8}>
-            {!!errors.projectimages && (
+            {!!errors.projectfiles && (
               <FormHelperText error>
-                {errors?.projectimages?.message}
+                {errors?.projectfiles?.message}
               </FormHelperText>
             )}
           </Box>
         </Grid>
 
-        <Box mt={2}>
-          <Typography variant="h6" color="textPrimary">
-            Project documents
-          </Typography>
-        </Box>
-
-        <Grid item xs={12}>
-          <Controller
-            name="projectdocuments"
-            control={control}
-            render={(props) => (
-              <DropzoneArea
-                onChange={(e) => props.onChange(e)}
-                filesLimit={10}
-                initialFiles={data.projectdocuments}
-                maxFileSize={10000000}
-                showFileNames={true}
-              />
-            )}
-          />
-          <Box ml={1.8}>
-            {!!errors.projectdocuments && (
-              <FormHelperText error>
-                {errors?.projectdocuments?.message}
-              </FormHelperText>
-            )}
-          </Box>
-        </Grid>
+       
       </Box>
       <DevTool control={control} />
       <Box mt={6} display="flex">

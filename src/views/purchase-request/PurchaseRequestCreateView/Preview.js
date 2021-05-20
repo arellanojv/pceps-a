@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import Markdown from 'react-markdown/with-html';
@@ -39,10 +39,7 @@ const formatter = new Intl.NumberFormat('en-US', {
 });
 
 const schema = yup.object().shape({
-  projectimages: yup
-    .array()
-    .required('The value for government ID cannot be blank'),
-  projectdocuments: yup
+  projectfiles: yup
     .array()
     .required('The value for government ID cannot be blank'),
 });
@@ -50,9 +47,9 @@ const schema = yup.object().shape({
 const Preview = ({ className, onBack, onComplete, ...rest }) => {
   const classes = useStyles();
   const [isSubmitting, setSubmitting] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState('Complete');
   const [uploadedImages, setUploadedImages] = useState([]);
   const { setValues, data } = usePurchaseRequest();
-  const [projectImagesUrl, setProjectImagesUrl] = useState([]);
   const { user } = useAuth();
 
   const db = firebase.firestore();
@@ -63,67 +60,86 @@ const Preview = ({ className, onBack, onComplete, ...rest }) => {
     resolver: yupResolver(schema),
   });
 
-  // useEffect(() => {
-  //   setUploadedImages(data.projectimages);
-  //   return () => {
-  //     setValues(data);
-  //   };
-  // }, []);
-
-  const projectFilesUpload = async () => {
-    const files = data.projectimages;
-    files.map(async (file) => {
-      const storageRef = storage.ref();
-      const fileRef = storageRef.child('project_images/' + file.name);
-      try {
-        // setSubmitting(true);
-        await fileRef.put(file);
-        const uploadedFileURL = await fileRef.getDownloadURL();
-        setProjectImagesUrl((projectImagesUrl) => [
-          ...projectImagesUrl,
-          uploadedFileURL,
-        ]);
-        console.log('Project Images Uploaded');
-      } catch (err) {
-        console.log(err);
-      } finally {
-        // setSubmitting(false);
-      }
-    });
-  };
-
   const onSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setButtonLabel('PLease wait...');
+    // https://stackoverflow.com/questions/58425363/how-to-call-a-function-after-map-loop-executed
+    var projectFiles = data.projectfiles.map(
+      (file) =>
+        new Promise((resolve, reject) => {
+          try {
+            const storageRef = storage.ref();
+            var uploadTask = storageRef
+              .child('project_images/' + file.name)
+              .put(file);
+            uploadTask.on(
+              'state_changed',
+              (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var progress =
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setButtonLabel('Upload is ' + Math.floor(progress) + '% done');
+                switch (snapshot.state) {
+                  case firebase.storage.TaskState.PAUSED: // or 'paused'
+                    console.log('Upload is paused');
+                    break;
+                  case firebase.storage.TaskState.RUNNING: // or 'running'
+                    console.log('Upload is running');
+                    break;
+                }
+              },
+              (error) => {
+                // Handle unsuccessful uploads
+              },
+              () => {
+                setButtonLabel('PLease wait...');
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                  resolve(downloadURL);
+                });
+              }
+            );
+          } catch (error) {
+            console.log(error);
+            resolve(null); // so one failure doesn't stop the whole process
+          }
+        })
+    );
 
-    projectFilesUpload();
-
-    return db
-      .collection('purchase_request')
-      .doc()
-      .set({
-        user: user.id,
-        title: data.title,
-        description: data.description,
-        budget: formatter.format(data.budget),
-        category: data.category,
-        projectdeadline: data.projectdeadline,
-        full_address: {
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          zip: data.zip,
-        },
-        created: firebase.firestore.Timestamp.now(),
-        modified: firebase.firestore.Timestamp.now(),
-      })
-      .then(() => {
-        if (onComplete) {
-          onComplete();
-        }
-      })
-      .catch((error) => {
-        console.error('Error updating document: ', error);
-      });
+    Promise.all(projectFiles).then((projectFilesArray) => {
+      return db
+        .collection('purchase_request')
+        .doc()
+        .set({
+          user: user.id,
+          title: data.title,
+          description: data.description,
+          budget: data.budget,
+          category: data.category,
+          projectdeadline: data.projectdeadline,
+          full_address: {
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zip: data.zip,
+          },
+          projectfiles: projectFilesArray,
+          created: firebase.firestore.Timestamp.now(),
+          modified: firebase.firestore.Timestamp.now(),
+          status: 1 //active
+        })
+        .then(() => {
+          if (onComplete) {
+            onComplete();
+          }
+        })
+        .catch((error) => {
+          console.error('Error updating document: ', error);
+        });
+        setSubmitting(false);
+        setButtonLabel('Complete');
+    });
   };
 
   return (
@@ -200,31 +216,10 @@ const Preview = ({ className, onBack, onComplete, ...rest }) => {
 
           <Grid item xs={12}>
             <List>
-              {data.projectimages &&
-                data.projectimages.map((file) => (
+              {data.projectfiles &&
+                data.projectfiles.map((file) => (
                   <ListItem key={file.lastModified}>
                     <ListItemText primary={file.name} secondary={null} />
-                  </ListItem>
-                ))}
-            </List>
-          </Grid>
-
-          <Box mt={3}>
-            <Typography variant="subtitle2" color="textSecondary">
-              Project documents
-            </Typography>
-          </Box>
-
-          <Grid item xs={12}>
-            <List>
-              {data.projectdocuments &&
-                data.projectdocuments.map((file) => (
-                  <ListItem key={file.lastModified}>
-                    <ListItemText
-                      small={true}
-                      primary={file.name}
-                      secondary={null}
-                    />
                   </ListItem>
                 ))}
             </List>
@@ -245,7 +240,7 @@ const Preview = ({ className, onBack, onComplete, ...rest }) => {
           variant="contained"
           size="large"
         >
-          Complete
+          {buttonLabel}
         </Button>
       </Box>
     </form>
