@@ -228,6 +228,11 @@ const routes = [
       },
       {
         exact: true,
+        path: "/app/purchase_request/:id",
+        component: lazy(() => import("src/views/purchase-request/PurchaseRequestDetailsView")),
+      },
+      {
+        exact: true,
         path: "/app/reports/dashboard",
         component: lazy(() => import("src/views/reports/DashboardView")),
       },

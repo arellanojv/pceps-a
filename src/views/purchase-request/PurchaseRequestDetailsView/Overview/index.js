@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
 
 const Overview = ({ className, project, ...rest }) => {
   const classes = useStyles();
-  console.log('Project', project)
+
   return (
     <Grid
       className={clsx(classes.root, className)}
@@ -33,7 +33,7 @@ const Overview = ({ className, project, ...rest }) => {
       >
         <Brief project={project} />
         <Box mt={3}>
-          <Files files={project.files} />
+          <Files files={project.projectfiles} />
         </Box>
       </Grid>
       <Grid
@@ -45,7 +45,7 @@ const Overview = ({ className, project, ...rest }) => {
         <Box mb={3}>
           <Metadata project={project} />
         </Box>
-        <Members members={project.members} />
+        
       </Grid>
     </Grid>
   );

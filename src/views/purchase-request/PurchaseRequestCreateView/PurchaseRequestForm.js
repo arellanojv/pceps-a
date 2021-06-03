@@ -277,7 +277,7 @@ const PurchaseRequestForm = ({ onNext }) => {
 
         <Box mt={2}>
           <Typography variant="h6" color="textPrimary">
-            Project files (Upload Images / PDFs Here)
+            Project pictures
           </Typography>
         </Box>
 
@@ -292,7 +292,7 @@ const PurchaseRequestForm = ({ onNext }) => {
                 initialFiles={data.projectfiles}
                 maxFileSize={10000000}
                 showFileNames={true}
-                acceptedFiles={['image/jpeg', 'image/png', '.pdf']}
+                acceptedFiles={['image/jpeg', 'image/png']}
               />
             )}
           />
