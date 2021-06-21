@@ -44,7 +44,7 @@ const Metadata = ({ className, project, ...rest }) => {
           <Avatar
             alt="Author"
             component={RouterLink}
-            src='http://localhost:3000/static/images/avatars/avatar_9.png'
+            src={project.author.avatar}
             to="#"
           >
             {getInitials(project.author.name)}

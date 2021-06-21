@@ -11,7 +11,6 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import QuillEditor from 'src/components/QuillEditor';
-import FilesDropzone from 'src/components/FilesDropzone';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useForm, Controller } from 'react-hook-form';
@@ -56,28 +55,8 @@ const ScopeOfWork = ({ className, onBack, onNext, ...rest }) => {
   const onSubmit = (data) => {
     if (onNext) {
       onNext();
-      // setValues(data);
     }
   };
-
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-
-  //   try {
-  //     setSubmitting(true);
-
-  //     // NOTE: Make API request
-
-  //     if (onNext) {
-  //       onNext();
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setError(err.message);
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
 
   return (
     <form
@@ -91,21 +70,6 @@ const ScopeOfWork = ({ className, onBack, onNext, ...rest }) => {
             <Typography variant="h5" color="textPrimary">
               Describe your purchase request
             </Typography>
-
-            {/* <Controller
-              name="description"
-              control={control}
-              render={(props) => (
-                <Paper className={classes.editorContainer} variant="outlined">
-                  <QuillEditor
-                    // onChange={(e) => props.onChange(e)}
-                    handleChange={handleChange}
-                    value={content}
-                    className={classes.editor}
-                  />
-                </Paper>
-              )}
-            /> */}
 
             <Controller
               control={control}
