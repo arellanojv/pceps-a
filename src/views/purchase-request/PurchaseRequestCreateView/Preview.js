@@ -112,7 +112,11 @@ const Preview = ({ className, onBack, onComplete, ...rest }) => {
         .collection('purchase_request')
         .doc()
         .set({
-          user: user.id,
+          author: {
+            avatar: 'http://localhost:3000/static/images/avatars/avatar_9.png',
+            id: user.id,
+            name: 'Jhon Arellano',
+          },
           title: data.title,
           description: data.description,
           budget: data.budget,
@@ -127,7 +131,7 @@ const Preview = ({ className, onBack, onComplete, ...rest }) => {
           projectfiles: projectFilesArray,
           created: firebase.firestore.Timestamp.now(),
           modified: firebase.firestore.Timestamp.now(),
-          status: 1 //active
+          status: 1, //active
         })
         .then(() => {
           if (onComplete) {
@@ -137,8 +141,8 @@ const Preview = ({ className, onBack, onComplete, ...rest }) => {
         .catch((error) => {
           console.error('Error updating document: ', error);
         });
-        setSubmitting(false);
-        setButtonLabel('Complete');
+      setSubmitting(false);
+      setButtonLabel('Complete');
     });
   };
 

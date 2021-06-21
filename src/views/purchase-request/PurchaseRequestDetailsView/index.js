@@ -14,6 +14,7 @@ import Page from 'src/components/Page';
 import Header from './Header';
 import Overview from './Overview';
 import firebase from 'src/lib/firebase';
+import { useParams } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,12 +25,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
 const PurchaseReqeuestDetailsView = () => {
   const classes = useStyles();
   const isMountedRef = useIsMountedRef();
   const [currentTab, setCurrentTab] = useState('overview');
   const [project, setProject] = useState(null);
-
+  let { id } = useParams();
+  
   const tabs = [
     { value: 'overview', label: 'Overview' },
     { value: 'applicants', label: 'Applicants' },
@@ -39,7 +43,7 @@ const PurchaseReqeuestDetailsView = () => {
   };
 
   const db = firebase.firestore();
-  var docRef = db.collection('purchase_request').doc('1Wstpn3M8ynvHlYtXjfD');
+  var docRef = db.collection('purchase_request').doc(id);
 
   const getProject = useCallback(async () => {
       docRef
