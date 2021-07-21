@@ -48,6 +48,10 @@ const sections = [
             href: '/app/projects/create'
           },
           {
+            title: 'Browse',
+            href: '/app/purchase-requests/browse'
+          },
+          {
             title: 'Create Purchase Request',
             href: '/app/purchase-request/create'
           },
