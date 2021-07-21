@@ -211,6 +211,13 @@ const routes = [
       },
       {
         exact: true,
+        path: "/app/purchase-requests/browse",
+        component: lazy(() =>
+          import("src/views/purchase-request/PurchaseRequestBrowseView")
+        ),
+      },
+      {
+        exact: true,
         path: "/app/purchase-request/create",
         component: lazy(() =>
           import("src/views/purchase-request/PurchaseRequestCreateView")
