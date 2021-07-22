@@ -217,7 +217,7 @@ const PurchaseRequestCreateView = () => {
                     variant="contained"
                     color="secondary"
                     component={RouterLink}
-                    to="/app/projects/1"
+                    to="/app/purchase-requests/browse"
                   >
                     View your Purchase request
                   </Button>
