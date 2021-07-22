@@ -399,7 +399,7 @@ const Results = ({ className, purchaseRequests, ...rest }) => {
                       {purchaseRequests.id}
                     </TableCell>
                     <TableCell>
-                      {moment(purchaseRequests.projectdeadline).format('DD/MM/YYYY')}
+                      {moment(purchaseRequests.projectdeadline).format('DD MMM YYYY')}
                     </TableCell>
                     <TableCell align="right">
                       <IconButton
