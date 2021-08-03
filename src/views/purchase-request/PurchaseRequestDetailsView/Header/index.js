@@ -98,7 +98,7 @@ const Header = ({ className, project, ...rest }) => {
               color="inherit"
               component="span"
             >
-              {`Deadline ${moment(project.projectdeadline).fromNow()}`}
+              {`Deadline ${moment(project.projectdeadline.toDate().toDateString()).fromNow()}`}
             </Typography>
           </div>
         </Box>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Container, makeStyles } from '@material-ui/core';
-import axios from 'src/utils/axios';
 import Page from 'src/components/Page';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import firebase from 'src/lib/firebase';
+import useAuth from 'src/hooks/useAuth';
 import Header from './Header';
 import Results from './Results';
 
@@ -20,12 +20,13 @@ const PurchaseRequestListView = () => {
   const classes = useStyles();
   const isMountedRef = useIsMountedRef();
   const [purchaseRequests, setPurchaseRequest] = useState([]);
+  const { user } = useAuth();
 
   const getPuchaseRequests = useCallback(async () => {
     const db = firebase.firestore();
     const response = db
       .collection('purchase_request')
-      .where('author.id', '==', 'C8hw4Kq0ypZJkxcc60itIRMKmv13');
+      .where('author.id', '==', user.id);
     const data = await response.get();
     if (isMountedRef.current) {
       setPurchaseRequest(data.docs.map((doc) => ({id: doc.id, ...doc.data()})));
