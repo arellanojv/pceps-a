@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core';
 import Metadata from './Metadata';
 import Brief from './Brief';
-import Members from './Members';
 import Files from './Files';
 
 const useStyles = makeStyles(() => ({

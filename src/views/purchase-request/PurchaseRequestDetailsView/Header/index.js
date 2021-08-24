@@ -17,7 +17,7 @@ import {
   AlertTriangle as AlertIcon,
   Send as SendIcon
 } from 'react-feather';
-import ApplyModal from './ApplyModal';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {},

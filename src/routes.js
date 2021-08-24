@@ -218,13 +218,6 @@ const routes = [
       },
       {
         exact: true,
-        path: "/app/purchase-request/create",
-        component: lazy(() =>
-          import("src/views/purchase-request/PurchaseRequestCreateView")
-        ),
-      },
-      {
-        exact: true,
         path: "/app/projects/:id",
         component: lazy(() => import("src/views/project/ProjectDetailsView")),
       },
@@ -232,6 +225,18 @@ const routes = [
         exact: true,
         path: "/app/projects",
         component: () => <Redirect to="/app/projects/browse" />,
+      },
+      {
+        exact: true,
+        path: "/app/purchase-request/create",
+        component: lazy(() =>
+          import("src/views/purchase-request/PurchaseRequestCreateView")
+        ),
+      },
+      {
+        exact: true,
+        path: "/app/purchase-request/edit/:id",
+        component: lazy(() => import("src/views/purchase-request/PurchaseRequestEditView")),
       },
       {
         exact: true,

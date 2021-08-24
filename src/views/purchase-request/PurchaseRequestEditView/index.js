@@ -30,8 +30,8 @@ import {
   
 } from 'react-feather';
 import Page from 'src/components/Page';
-import PurchaseRequestForm from './PurchaseRequestForm';
 import { DataProvider } from 'src/contexts/PurchaseRequestContext';
+import PurchaseRequestForm from './PurchaseRequestForm';
 import Preview from './Preview';
 
 const steps = [
@@ -106,12 +106,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PurchaseRequestCreateView = () => {
-  const classes = useStyles();
+const PurchaseRequestEditView = () => {
+	const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  const handleNext = () => {
+	const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -123,8 +123,8 @@ const PurchaseRequestCreateView = () => {
     setCompleted(true);
   };
 
-  return (
-    <Page className={classes.root} title="PCEPS | Create Purchase Request">
+	return (
+    <Page className={classes.root} title="PCEPS | Edit Purchase Request">
       <Container maxWidth="lg">
         <Box mb={3}>
           <Breadcrumbs
@@ -226,6 +226,7 @@ const PurchaseRequestCreateView = () => {
       </Container>
     </Page>
   );
+
 };
 
-export default PurchaseRequestCreateView;
+export default PurchaseRequestEditView;
