@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import Markdown from 'react-markdown/with-html';
@@ -10,15 +10,14 @@ import {
   Grid,
   Typography,
   makeStyles,
-  FormHelperText,
   List,
   ListItem,
   ListItemText,
 } from '@material-ui/core';
 import { usePurchaseRequest } from 'src/contexts/PurchaseRequestContext';
-import * as yup from 'yup';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+// import * as yup from 'yup';
+// import { useForm } from 'react-hook-form';
+// import { yupResolver } from '@hookform/resolvers/yup';
 import firebase from 'src/lib/firebase';
 import useAuth from 'src/hooks/useAuth';
 import { format } from 'date-fns';
@@ -38,27 +37,26 @@ const formatter = new Intl.NumberFormat('en-US', {
   currency: 'PHP',
 });
 
-const schema = yup.object().shape({
-  projectfiles: yup
-    .array()
-    .required('The value for government ID cannot be blank'),
-});
+// const schema = yup.object().shape({
+//   projectfiles: yup
+//     .array()
+//     .required('The value for government ID cannot be blank'),
+// });
 
 const Preview = ({ className, onBack, onComplete, ...rest }) => {
   const classes = useStyles();
   const [isSubmitting, setSubmitting] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('Complete');
-  const [uploadedImages, setUploadedImages] = useState([]);
   const { setValues, data } = usePurchaseRequest();
   const { user } = useAuth();
 
   const db = firebase.firestore();
   const storage = firebase.storage();
 
-  const { register, handleSubmit, errors, control } = useForm({
-    mode: 'onBlur',
-    resolver: yupResolver(schema),
-  });
+  // const { register, handleSubmit, errors, control } = useForm({
+  //   mode: 'onBlur',
+  //   resolver: yupResolver(schema),
+  // });
 
   const onSubmit = async (e) => {
     e.preventDefault();

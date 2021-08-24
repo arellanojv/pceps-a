@@ -7,10 +7,8 @@ import {
   Tab,
   makeStyles,
 } from '@material-ui/core';
-import axios from 'src/utils/axios';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import Page from 'src/components/Page';
-// import Applicants from './Applicants';
 import Header from './Header';
 import Overview from './Overview';
 import firebase from 'src/lib/firebase';

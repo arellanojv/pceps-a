@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import {
@@ -14,7 +14,7 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import SignatureCanvas from 'react-signature-canvas';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useData } from 'src/contexts/UserActivationContext';
 import firebase from 'src/lib/firebase';
 import useAuth from 'src/hooks/useAuth';
@@ -59,7 +59,6 @@ const StatementOfAcceptance = ({ className, onBack, onComplete, ...rest }) => {
   const [signFile, setSignFile] = useState([]);
   const [uploadExecuted, setUploadExecution] = useState(0);
 
-  const db = firebase.firestore();
   const storage = firebase.storage();
 
   const { register, handleSubmit, errors, reset } = useForm({
