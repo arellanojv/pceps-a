@@ -8,6 +8,7 @@ import {
   TextField,
   FormHelperText,
 } from '@material-ui/core';
+import moment from 'moment';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import CurrencyTextField from '@unicef/material-ui-currency-textfield';
@@ -20,7 +21,6 @@ import { usePurchaseRequest } from 'src/contexts/PurchaseRequestContext';
 import { CATEGORIES } from 'src/constants/categories';
 import { STATEADDRESS } from 'src/constants/addressstate';
 import { DropzoneArea } from 'material-ui-dropzone';
-import { DevTool } from '@hookform/devtools';
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -41,25 +41,25 @@ const schema = yup.object().shape({
     .required('The value for government ID cannot be blank'),
 });
 
-const PurchaseRequestForm = ({ onNext }) => {
+const PurchaseRequestEditForm = ({ onNext, purchaseRequest}) => {
   const { data, setValues } = usePurchaseRequest();
   const [isSubmitting, setSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState();
-
+  console.log("DATAS", purchaseRequest.budget)
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {
-      title: data.title,
-      description: data.description,
-      budget: data.budget,
-      category: data.category,
-      projectdeadline: format(
+      title: purchaseRequest.title || data.title,
+      description: purchaseRequest.description || data.description,
+      budget: purchaseRequest.budget || data.budget,
+      category: purchaseRequest.category || data.category,
+      projectdeadline:  purchaseRequest.projectdeadline.toDate().toDateString() || format(
         data.projectdeadline ? data.projectdeadline : new Date(),
         'MM/dd/yyyy'
       ),
-      address: data.address,
-      city: data.city,
-      state: data.state,
-      zip: data.zip,
+      address: purchaseRequest.full_address.address || data.address,
+      city: purchaseRequest.full_address.city || data.city,
+      state: purchaseRequest.full_address.state || data.state,
+      zip: purchaseRequest.full_address.zip || data.zip,
     },
     mode: 'onBlur',
     resolver: yupResolver(schema),
@@ -133,7 +133,7 @@ const PurchaseRequestForm = ({ onNext }) => {
                   size="small"
                   label="Amount"
                   variant="outlined"
-                  value={data.budget}
+                  value={purchaseRequest.budget || data.budget}
                   error={!!errors.budget}
                   currencySymbol="₱"
                   minimumValue={0}
@@ -289,7 +289,7 @@ const PurchaseRequestForm = ({ onNext }) => {
               <DropzoneArea
                 onChange={(e) => props.onChange(e)}
                 filesLimit={10}
-                initialFiles={data.projectfiles}
+                initialFiles={purchaseRequest.projectfiles || data.projectfiles}
                 maxFileSize={10000000}
                 showFileNames={true}
                 acceptedFiles={['image/jpeg', 'image/png']}
@@ -307,7 +307,6 @@ const PurchaseRequestForm = ({ onNext }) => {
 
        
       </Box>
-      <DevTool control={control} />
       <Box mt={6} display="flex">
         <Box flexGrow={1} />
         <Button
@@ -324,14 +323,14 @@ const PurchaseRequestForm = ({ onNext }) => {
   );
 };
 
-PurchaseRequestForm.propTypes = {
+PurchaseRequestEditForm.propTypes = {
   onNext: PropTypes.func,
   onBack: PropTypes.func,
 };
 
-PurchaseRequestForm.defaultProps = {
+PurchaseRequestEditForm.defaultProps = {
   onNext: () => {},
   onBack: () => {},
 };
 
-export default PurchaseRequestForm;
+export default PurchaseRequestEditForm;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
@@ -22,17 +22,15 @@ import {
   makeStyles,
   withStyles,
 } from '@material-ui/core';
+import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import {
-  
-  Check as CheckIcon,
-  Briefcase as BriefcaseIcon,
-  
-} from 'react-feather';
+import { Check as CheckIcon, Briefcase as BriefcaseIcon } from 'react-feather';
 import Page from 'src/components/Page';
 import { DataProvider } from 'src/contexts/PurchaseRequestContext';
-import PurchaseRequestForm from './PurchaseRequestForm';
+import PurchaseRequestEditForm from './PurchaseRequestEditForm';
 import Preview from './Preview';
+import firebase from 'src/lib/firebase';
+import { useParams } from 'react-router';
 
 const steps = [
   {
@@ -107,11 +105,45 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const PurchaseRequestEditView = () => {
-	const classes = useStyles();
+  const classes = useStyles();
+  const isMountedRef = useIsMountedRef();
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [purchaseRequest, setPurchaseRequest] = useState(null);
+  let { purchaseRequestId } = useParams();
 
-	const handleNext = () => {
+  console.log('This is the PR ID:', purchaseRequestId);
+
+  //Firebase Call
+  const db = firebase.firestore();
+  var docRef = db.collection('purchase_request').doc(purchaseRequestId);
+
+  const getPurchaseRequest = useCallback(async () => {
+    docRef
+      .get()
+      .then((doc) => {
+        if (isMountedRef.current) {
+          console.log('Document data:', doc.data());
+          setPurchaseRequest(doc.data());
+        } else {
+          // doc.data() will be undefined in this case
+          console.log('No such document!');
+        }
+      })
+      .catch((error) => {
+        console.log('Error getting document:', error);
+      });
+  }, [isMountedRef]);
+
+  useEffect(() => {
+    getPurchaseRequest();
+  }, [getPurchaseRequest]);
+
+  if (!purchaseRequest) {
+    return null;
+  }
+
+  const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -123,7 +155,7 @@ const PurchaseRequestEditView = () => {
     setCompleted(true);
   };
 
-	return (
+  return (
     <Page className={classes.root} title="PCEPS | Edit Purchase Request">
       <Container maxWidth="lg">
         <Box mb={3}>
@@ -167,7 +199,7 @@ const PurchaseRequestEditView = () => {
                 <Box p={3}>
                   <DataProvider>
                     {activeStep === 0 && (
-                      <PurchaseRequestForm onNext={handleNext} />
+                      <PurchaseRequestEditForm onNext={handleNext} purchaseRequest={purchaseRequest} />
                     )}
                     {activeStep === 1 && (
                       <Preview
@@ -226,7 +258,6 @@ const PurchaseRequestEditView = () => {
       </Container>
     </Page>
   );
-
 };
 
 export default PurchaseRequestEditView;
